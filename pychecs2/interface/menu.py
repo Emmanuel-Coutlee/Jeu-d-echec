@@ -1,6 +1,7 @@
 from tkinter import *
 
-def premier_menu(self):
+class menu_global(Tk):
+    def premier_menu(self):
         self.menu_bar= Menu()
         self.partie_menu = Menu(self.menu_bar, tearoff = 0)
         self.partie_menu.add_command(label= 'Nouvelle partie', command = lambda:self.quit)
@@ -16,15 +17,16 @@ def premier_menu(self):
 
 
         self.aide_menu = Menu(tearoff= 0)
-        self.aide_menu.add_command(label= 'Règle de jeu',command = lambda:self.quit)
-        self.aide_menu.add_command(label= 'À propos',command = lambda:self.about())
+        self.aide_menu.add_command(label= 'Règle de jeu',command = lambda:self.regle_du_jeu())
+        self.aide_menu.add_command(label= 'À propos',command = lambda:self.quit)
 
         self.menu_bar.add_cascade(label= 'Partie', menu= self.partie_menu)
         self.menu_bar.add_cascade(label= 'Affichage', menu= self.affichage_menu)
         self.menu_bar.add_cascade(label= 'Aide', menu= self.aide_menu)
         self.config(menu = self.menu_bar)
 
-def about(self):
+    def regle_du_jeu(self):
         toplevel = Toplevel()
-        label1 = Label(toplevel, text="Text", height=10, width=100)
-        label1.grid()
+        toplevel.title("Règle du jeu")
+        les_regle = Label(toplevel, text="Text", height=10, width=50)
+        les_regle.grid()

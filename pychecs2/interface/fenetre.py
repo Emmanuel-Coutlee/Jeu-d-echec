@@ -97,7 +97,7 @@ class canvas_echiquier(Canvas):
             self.delete('piece')
             self.dessiner_piece()
 
-class fenetre(Tk):
+class fenetre(Tk,menu_global):
 
     def __init__(self):
         super().__init__()
@@ -118,7 +118,7 @@ class fenetre(Tk):
         self.messages.grid()
         self.canvas_echiquier.bind('<Button-1>', self.selectionner)
 
-        premier_menu(self)
+        self.premier_menu()
 
     def selectionner(self,event):
         ligne = event.y // self.canvas_echiquier.n_pixels_par_case
