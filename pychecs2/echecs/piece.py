@@ -2,6 +2,7 @@
 """Module contenant la classe de base Piece, ainsi qu'une classe fille pour chacun des types de pièces du jeu d'échecs.
 
 """
+#
 # TODO: Si votre système n'affiche pas correctement les caractères unicodes du jeu d'échecs,
 # mettez cette constante (variable globale) à False. Un tutoriel est présent sur le site Web
 # du cours pour vous aider à faire fonctionner les caractères Unicoe sous Windows.
@@ -99,45 +100,67 @@ class Pion(Piece):
         super().__init__(couleur, False)
 
     def peut_se_deplacer_vers(self, position_source, position_cible):
-        colonne_source, colonne_cible = ord(position_source[0]), ord(position_cible[0])
-        rangee_source, rangee_cible = int(position_source[1]), int(position_cible[1])
+        # pour chacune des autres classes filles, ci-bas. Nous ne vous demandons pas de documenter ces méthodes,
+        # puisque la documentation est déjà ci-haut, dans la classe mère.
 
-        # Un pion se déplace sur une même colonne.
+        rangee_source = int (position_source [1])
+        rangee_cible = int(position_cible [1])
+        colonne_source = ord(position_source [0])
+        colonne_cible = ord(position_cible[0])
+
         if colonne_cible != colonne_source:
             return False
 
-        # Si le pion n'a jamais bougé, il peut bouger de deux cases. Sinon, seulement d'une case.
-        # Notez que c'est ici le seul endroit où nous faisons référence à la taille de l'échiquier.
-        # Pour rendre nos classes de pièces vraiment indépendantes de cette taille, nous pourrions
-        # par exemple ajouter un attribut n_deplacements, qui sera incrémenté si la pièce se
-        # déplace.
-        difference = rangee_source - rangee_cible
         if self.est_blanc():
+
+            if rangee_cible == (rangee_source+1):
+                return True
+
             if rangee_source == 2:
-                return difference in (-1, -2)
-            else:
-                return difference == -1
+                if rangee_cible == (rangee_source+2):
+                    return True
 
-        else:
-            if rangee_source == 7:
-                return difference in (1, 2)
-            else:
-                return difference == 1
-
-    def peut_faire_une_prise_vers(self, position_source, position_cible):
-        colonne_source, colonne_cible = ord(position_source[0]), ord(position_cible[0])
-        rangee_source, rangee_cible = int(position_source[1]), int(position_cible[1])
-
-        # Le pion fait une prise en diagonale, d'une case seulement, et la direction dépend
-        # de sa couleur.
-        if colonne_cible not in (colonne_source - 1, colonne_source + 1):
             return False
 
-        if self.est_blanc():
-            return rangee_cible == rangee_source + 1
+        if self.est_noir():
 
-        else:
-            return rangee_cible == rangee_source - 1
+             if rangee_cible == (rangee_source-1):
+                 return True
+
+             if rangee_source==7:
+                if rangee_cible == (rangee_source-2):
+                    return True
+
+             return False
+
+    def peut_faire_une_prise_vers(self, position_source, position_cible):
+
+        rangee_source = int (position_source [1])
+        rangee_cible = int(position_cible [1])
+        colonne_source = ord(position_source [0])
+        colonne_cible = ord(position_cible[0])
+
+
+        if self.est_blanc():
+            if rangee_cible == (rangee_source+1):
+                if colonne_cible == (colonne_source+1):
+                    return True
+
+                if colonne_cible == (colonne_source-1):
+                    return True
+
+            return False
+
+        if self.est_noir():
+
+            if (rangee_cible) == (rangee_source-1):
+                if (colonne_cible) == (colonne_source-1):
+                    return True
+
+                if (colonne_cible) == (colonne_source+1):
+                    return True
+
+            return False
 
     def __repr__(self):
         """Redéfinit comment on affiche un pion à l'écran. Nous utilisons la constante UTILISER_UNICODE
@@ -164,18 +187,19 @@ class Tour(Piece):
         super().__init__(couleur, False)
 
     def peut_se_deplacer_vers(self, position_source, position_cible):
-        colonne_source, colonne_cible = position_source[0], position_cible[0]
-        rangee_source, rangee_cible = position_source[1], position_cible[1]
 
-        # Une tour se déplace sur une même rangée ou une même ligne, peu importe la direction.
-        if colonne_cible != colonne_source and rangee_source != rangee_cible:
-            return False
+        rangee_source = int (position_source [1])
+        rangee_cible = int(position_cible [1])
+        colonne_source = ord(position_source [0])
+        colonne_cible = ord(position_cible[0])
 
-        # Par contre, elle ne peut pas rester sur place.
-        if colonne_source == colonne_cible and rangee_source == rangee_cible:
-            return False
+        if colonne_cible == colonne_source:
+            return True
 
-        return True
+        if rangee_cible == rangee_source:
+            return True
+
+        return False
 
     def __repr__(self):
         if self.est_blanc():
@@ -195,18 +219,22 @@ class Cavalier(Piece):
         super().__init__(couleur, True)
 
     def peut_se_deplacer_vers(self, position_source, position_cible):
-        colonne_source, colonne_cible = ord(position_source[0]), ord(position_cible[0])
-        rangee_source, rangee_cible = int(position_source[1]), int(position_cible[1])
 
-        # Un cavalier se déplace en "L", alors l'une de ses coordonnées soit varier de 1, et l'autre de 2.
-        distance_colonne = abs(colonne_source - colonne_cible)
-        distance_rangee = abs(rangee_source - rangee_cible)
+        rangee_source = int (position_source [1])
+        rangee_cible = int(position_cible [1])
+        colonne_source = ord(position_source [0])
+        colonne_cible = ord(position_cible[0])
 
-        if distance_colonne == 1 and distance_rangee == 2:
-            return True
+        difference_colonne = abs(colonne_cible - colonne_source)
+        difference_rangee = abs(rangee_cible - rangee_source)
 
-        if distance_colonne == 2 and distance_rangee == 1:
-            return True
+        if difference_colonne == 2:
+            if difference_rangee == 1:
+                return True
+
+        if difference_rangee == 2:
+            if difference_colonne == 1:
+                return True
 
         return False
 
@@ -228,18 +256,19 @@ class Fou(Piece):
         super().__init__(couleur, False)
 
     def peut_se_deplacer_vers(self, position_source, position_cible):
-        # Un fou se déplace en diagonale, c'est à dire, la distance entre les rangées et colonnes doit être la même.
-        colonne_source, colonne_cible = ord(position_source[0]), ord(position_cible[0])
-        rangee_source, rangee_cible = int(position_source[1]), int(position_cible[1])
 
-        if abs(colonne_source - colonne_cible) != abs(rangee_source - rangee_cible):
-            return False
+        rangee_source = int (position_source [1])
+        rangee_cible = int(position_cible [1])
+        colonne_source = ord(position_source [0])
+        colonne_cible = ord(position_cible[0])
 
-        # Par contre, il ne peut pas faire de sur-place.
-        if colonne_source == colonne_cible and rangee_source == rangee_cible:
-            return False
+        difference_colonne = abs(colonne_cible - colonne_source)
+        difference_rangee = abs(rangee_cible - rangee_source)
 
-        return True
+        if difference_colonne == difference_rangee:
+            return True
+
+        return False
 
     def __repr__(self):
         if self.est_blanc():
@@ -259,17 +288,26 @@ class Roi(Piece):
         super().__init__(couleur, False)
 
     def peut_se_deplacer_vers(self, position_source, position_cible):
-        # Un roi peut se déplacer d'une case, sur une ligne, rangée ou colonne.
-        colonne_source, colonne_cible = ord(position_source[0]), ord(position_cible[0])
-        rangee_source, rangee_cible = int(position_source[1]), int(position_cible[1])
 
-        distance_colonne = abs(colonne_source - colonne_cible)
-        distance_rangee = abs(rangee_source - rangee_cible)
+        rangee_source = int (position_source [1])
+        rangee_cible = int(position_cible [1])
+        colonne_source = ord(position_source [0])
+        colonne_cible = ord(position_cible[0])
 
-        if distance_rangee != 1 and distance_colonne != 1:
-            return False
+        if rangee_cible == (rangee_source-1):
+            return True
+        if rangee_cible == (rangee_source+1):
+            return True
+        if colonne_cible == (colonne_source-1):
+            return True
+        if colonne_cible == (colonne_source+1):
+            return True
 
-        return True
+        if abs(colonne_cible - colonne_source) == 1:
+            if abs(rangee_cible - rangee_source) == 1:
+                return True
+
+        return False
 
     def __repr__(self):
         if self.est_blanc():
@@ -289,12 +327,26 @@ class Dame(Piece):
         super().__init__(couleur, False)
 
     def peut_se_deplacer_vers(self, position_source, position_cible):
-        # Une mouvement pour une dame est valide si elle se déplace sur une rangée, colonne ou en diagonale.
-        # Notez que nous utilisons directement les méthodes à partir d'une classe, en passant comme premier
-        # argument l'objet courant (self). Il aurait été plus "propre" de se créer des nouvelles fonctions
-        # communes aux classes Tour, Fou et Dame pour éviter de faire ces appels à partir de la classe.
-        return Tour.peut_se_deplacer_vers(self, position_source, position_cible) or \
-            Fou.peut_se_deplacer_vers(self, position_source, position_cible)
+
+        rangee_source = int (position_source [1])
+        rangee_cible = int(position_cible [1])
+        colonne_source = ord(position_source [0])
+        colonne_cible = ord(position_cible[0])
+
+        difference_colonne = abs(colonne_cible - colonne_source)
+        difference_rangee = abs(rangee_cible - rangee_source)
+
+        if difference_colonne == difference_rangee:
+            return True
+
+        if rangee_source == rangee_cible:
+            return True
+
+        if colonne_source == colonne_cible:
+            return True
+
+        else:
+            return False
 
     def __repr__(self):
         if self.est_blanc():

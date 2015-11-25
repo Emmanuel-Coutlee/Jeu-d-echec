@@ -3,7 +3,7 @@
 dont un objet échiquier (une instance de la classe Echiquier).
 
 """
-from pychecs2.echecs.echiquier import Echiquier
+from pychecs.echiquier import Echiquier
 
 
 class Partie:
@@ -32,11 +32,15 @@ class Partie:
                 joueur n'a encore gagné.
 
         """
+        #Cas où le roi noir est absent de l'échiquier.
         if not self.echiquier.roi_de_couleur_est_dans_echiquier('noir'):
             return 'blanc'
-        elif not self.echiquier.roi_de_couleur_est_dans_echiquier('blanc'):
+
+        #Cas où le roi blanc est absent de l'échiquier.
+        if not self.echiquier.roi_de_couleur_est_dans_echiquier('blanc'):
             return 'noir'
 
+        #Cas où les deux rois sont sur l'échiquier.
         return 'aucun'
 
     def partie_terminee(self):
@@ -46,7 +50,37 @@ class Partie:
             bool: True si la partie est terminée, et False autrement.
 
         """
-        return self.determiner_gagnant() != 'aucun'
+        #Cas où le joueur blanc ou le joueur noir est le gagnant.
+        if self.determiner_gagnant() == 'blanc' or self.determiner_gagnant() == 'noir':
+            return True
+
+        #Cas où il n'y a encore aucun gagnant.
+        return False
+
+    def piece_position_depart(self,position_depart):
+        """
+        Détermine si la position de départ donner par l'utilisateur est sur l'échiquier.
+        On vérifie qu'il y a bien une pièce du joueur actif sur cette case.
+        S'il n'y a pas de pièce ou que c'est la pièce d'un autre joueur on retourne un message d'erreur.
+        :param position_depart:
+            str: Une chaine de charactère qui représente une position à évaluer.
+        :return:
+            bool: True si le la position est valide et a une pièce du joueur actif, et False autrement.
+        """
+        #On redemande la position de départ tant que la position n'est pas valide.
+        if not self.echiquier.position_est_valide(position_depart):
+            return False
+
+        #Tant qu'il n'y a pas de pièces on informe le joueur qu'il ne peux pas choisir cette case de départ et on redemande la position de départ
+        if self.echiquier.recuperer_piece_a_position(position_depart) is None:
+            print("Il n'y a pas de pièce sur cette case")
+            return False
+        #Tant que ce n'est pas une de ses pièces on informe le joueur qu'il ne peut pas jouer cette pièce et on redemande la position de départ.
+        if self.echiquier.couleur_piece_a_position(position_depart) != self.joueur_actif:
+            print("Vous jouer les pieces de l'autre joueur, TRICHEUR!")
+            return False
+        # Si c'est une bonne position, avec un pièce du joueur actif on retourne true.
+        return True
 
     def demander_positions(self):
         """Demande à l'utilisateur d'entrer les positions de départ et d'arrivée pour faire un déplacement. Si les
@@ -57,29 +91,33 @@ class Partie:
             str, str: Deux chaînes de caractères représentant les deux positions valides fournies par l'utilisateurs.
 
         """
-        while True:
-            # On demande et valide la position source.
-            while True:
-                source = input("Entrez position source: ")
-                if self.echiquier.position_est_valide(source) and self.echiquier.couleur_piece_a_position(source) == self.joueur_actif:
-                    break
+        #On demande la position de départ au joueur.
+        position_depart = str(input("Entrez la position départ:"))
 
-                print("Position invalide.\n")
+        #On redemande la position de départ tant que la position n'est pas une position avec une pièce du joueur.
+        while not self.piece_position_depart(position_depart):
+                    position_depart = str(input("Entrez la position départ:"))
 
-            # On demande et valide la position cible.
-            cible = input("Entrez position cible: ")
-            if self.echiquier.deplacement_est_valide(source, cible):
-                return source, cible
+        #On demande la position d'arriver au joueur.
+        position_arrive = str(input("Entrez la position arrivé:"))
 
-            print("Déplacement invalide.\n")
+        #On redemande la position d'arriver tant que la position n'est pas valide.
+        while not self.echiquier.position_est_valide(position_arrive):
+            position_arrive = str(input("Entrez la position arrivé:"))
+
+        #retourne les positions de départ et d'arriver.
+        return position_depart, position_arrive
 
     def joueur_suivant(self):
         """Change le joueur actif: passe de blanc à noir, ou de noir à blanc, selon la couleur du joueur actif.
 
         """
+        # Si le joueur actif est blanc on le change en noir
         if self.joueur_actif == 'blanc':
             self.joueur_actif = 'noir'
-        else:
+
+        #Si le joueur actif est noir on le change en blanc
+        elif self.joueur_actif == 'noir':
             self.joueur_actif = 'blanc'
 
     def jouer(self):
@@ -92,12 +130,35 @@ class Partie:
         Une fois la partie terminée, on félicite le joueur gagnant!
 
         """
-        while not self.partie_terminee():
-            print(self.echiquier)
-            print("\nAu tour du joueur {}".format(self.joueur_actif))
-            source, cible = self.demander_positions()
-            self.echiquier.deplacer(source, cible)
-            self.joueur_suivant()
 
-        print(self.echiquier)
-        print("\nPartie terminée! Le joueur {} a gagné".format(self.determiner_gagnant()))
+        partie_est_terminer = False
+
+        #On forme une boucle de jeu qui va continuer tant que la partie n'est pas terminer.
+        while not partie_est_terminer:
+
+            #On affiche l'échiquier.
+            print(self.echiquier)
+
+            #On informe quel est la couleur du joueur actif.
+            print("C'est au tour du joueur:",self.joueur_actif)
+
+            deplacement_valide = False
+
+            #On forme une seconde boucle qui va continuer tant qu'on n'entre pas un déplacement valide.
+            while not deplacement_valide:
+
+                #On demande à l'utilisateur les positions de départ et d'arriver du déplacement.
+                position_depart, position_arrive = self.demander_positions()
+
+                #Maintenant qu'on a une position de départ et d'arriver,on vérifie que c'est un déplacement valide.
+                deplacement_valide = self.echiquier.deplacer(position_depart,position_arrive)
+
+            #On verifie si la partie est terminé.
+            partie_est_terminer = self.partie_terminee()
+            #Si c'est le cas on félicite le joueur gagnant.
+            if partie_est_terminer:
+                print("Bravo joueur", self.joueur_actif,"vous avez gagné!")
+
+            #S'il n'y a pas de gagnant, la partie n'est pas fini, on change de joueur actif.
+            else:
+                self.joueur_suivant()

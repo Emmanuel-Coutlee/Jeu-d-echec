@@ -2,12 +2,13 @@ from tkinter import Canvas,Tk, Label, NSEW, Menu, Button
 import time
 from pychecs.echiquier import *
 
-#class cavas_chrono(Canvas):
-    #def __init__(self):
-     #   self.temps_debut = 60
-    #    self.temps_present = 60
+class cavas_chrono(Canvas):
+    def __init__(self):
+        self.temps_debut = 60
+        self.temps_present = 60
 
-   # def temps_avance(self, ):
+    def temps_avance(self, ):
+        None
 
 
 class canvas_echiquier(Canvas):
