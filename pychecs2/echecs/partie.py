@@ -3,7 +3,7 @@
 dont un objet échiquier (une instance de la classe Echiquier).
 
 """
-from pychecs.echiquier import Echiquier
+from pychecs2.echecs.echiquier import Echiquier
 
 
 class Partie:

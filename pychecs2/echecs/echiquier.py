@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pychecs.piece import Pion, Tour, Fou, Cavalier, Dame, Roi, UTILISER_UNICODE
+from pychecs2.echecs.piece import Pion, Tour, Fou, Cavalier, Dame, Roi, UTILISER_UNICODE
 
 
 class Echiquier:
@@ -240,6 +240,8 @@ class Echiquier:
         difference_rangee = abs(int(rangee_cible) - int(rangee_source))
 
         #vérification si le déplacement est valide en diagonale.
+        if difference_colonne != difference_rangee:
+            return False
         if difference_colonne == difference_rangee:
             rangee_a_verifier = self.rangees_entre(rangee_source,rangee_cible)
             colonne_a_verifier = self.colonnes_entre(colonne_source,colonne_cible)
