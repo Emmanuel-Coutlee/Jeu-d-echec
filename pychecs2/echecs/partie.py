@@ -4,6 +4,7 @@ dont un objet échiquier (une instance de la classe Echiquier).
 
 """
 from pychecs2.echecs.echiquier import Echiquier
+from pychecs2.interface.fenetre import *
 
 
 class Partie:
@@ -92,18 +93,18 @@ class Partie:
 
         """
         #On demande la position de départ au joueur.
-        position_depart = str(input("Entrez la position départ:"))
+        position_depart = fenetre.selectionner_pièce()
 
         #On redemande la position de départ tant que la position n'est pas une position avec une pièce du joueur.
         while not self.piece_position_depart(position_depart):
-                    position_depart = str(input("Entrez la position départ:"))
+                    position_depart = fenetre.selectionner_pièce()
 
         #On demande la position d'arriver au joueur.
-        position_arrive = str(input("Entrez la position arrivé:"))
+        position_arrive = fenetre.selectionner_arriver()
 
         #On redemande la position d'arriver tant que la position n'est pas valide.
         while not self.echiquier.position_est_valide(position_arrive):
-            position_arrive = str(input("Entrez la position arrivé:"))
+            position_arrive = fenetre.selectionner_arriver()
 
         #retourne les positions de départ et d'arriver.
         return position_depart, position_arrive
@@ -131,13 +132,14 @@ class Partie:
 
         """
 
+
         partie_est_terminer = False
 
         #On forme une boucle de jeu qui va continuer tant que la partie n'est pas terminer.
         while not partie_est_terminer:
 
             #On affiche l'échiquier.
-            print(self.echiquier)
+            f = fenetre()
 
             #On informe quel est la couleur du joueur actif.
             print("C'est au tour du joueur:",self.joueur_actif)
@@ -148,7 +150,11 @@ class Partie:
             while not deplacement_valide:
 
                 #On demande à l'utilisateur les positions de départ et d'arriver du déplacement.
-                position_depart, position_arrive = self.demander_positions()
+                while position_depart is None:
+                    position_depart = fenetre.selectionner_pièce
+                if position_depart is not None:
+                    while position_arrive is None:
+                        position_arrive = fenetre.selectionner_arriver
 
                 #Maintenant qu'on a une position de départ et d'arriver,on vérifie que c'est un déplacement valide.
                 deplacement_valide = self.echiquier.deplacer(position_depart,position_arrive)
@@ -162,3 +168,4 @@ class Partie:
             #S'il n'y a pas de gagnant, la partie n'est pas fini, on change de joueur actif.
             else:
                 self.joueur_suivant()
+        f.mainloop()

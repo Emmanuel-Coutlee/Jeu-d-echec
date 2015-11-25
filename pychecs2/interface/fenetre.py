@@ -45,7 +45,21 @@ class canvas_echiquier(Canvas):
                 self.create_rectangle(x_coin_superieur_gauche, y_coin_superieur_gauche,
                                       x_coin_inferieur_droit, y_coin_inferieur_droit, fill = couleur, tag = 'case')
 
-    def changer_couleur_1(self, type, couleur):
+    def changer_couleur_position(self, colonne, ligne):
+        x_coin_superieur_gauche = colonne*self.n_pixels_par_case
+        y_coin_superieur_gauche = ligne*self.n_pixels_par_case
+        x_coin_inferieur_droit = colonne*self.n_pixels_par_case + self.n_pixels_par_case
+        y_coin_inferieur_droit = ligne*self.n_pixels_par_case + self.n_pixels_par_case
+
+
+        self.create_rectangle(x_coin_superieur_gauche, y_coin_superieur_gauche,
+                            x_coin_inferieur_droit, y_coin_inferieur_droit, fill = 'yellow', tag = 'case')
+
+        self.delete('piece')
+        self.dessiner_piece()
+
+
+    def changer_couleur_theme(self, type, couleur):
         if type == 1:
             self.couleur_1 = couleur
         elif type == 2:
@@ -116,11 +130,11 @@ class fenetre(Tk,menu_global):
 
         self.messages = Label(self)
         self.messages.grid()
-        self.canvas_echiquier.bind('<Button-1>', self.selectionner)
+        self.canvas_echiquier.bind('<Button-1>', self.selectionner_piece)
 
         self.premier_menu()
 
-    def selectionner(self,event):
+    def selectionner_piece(self,event):
         ligne = event.y // self.canvas_echiquier.n_pixels_par_case
         colonne = event.x // self.canvas_echiquier.n_pixels_par_case
         position = "{}{}".format(self.canvas_echiquier.lettres_colonnes[colonne], int(self.canvas_echiquier.chiffres_rangees[self.canvas_echiquier.n_ligne- ligne - 1]))
@@ -130,10 +144,18 @@ class fenetre(Tk,menu_global):
             self.position_selectionnee = position
             self.messages['foreground'] = 'black'
             self.messages['text'] = 'Pièce séléctionné : {} à la position {}'.format(piece, self.position_selectionnee)
+            self.canvas_echiquier.changer_couleur_position(colonne, ligne)
+            return position
         except KeyError:
             self.messages['foreground'] = 'red'
             self.messages['text'] = 'erreur aucune piece ici'
+            return None
 
+    def selectionner_arriver(self, event):
+        ligne = event.y // self.canvas_echiquier.n_pixels_par_case
+        colonne = event.x // self.canvas_echiquier.n_pixels_par_case
+        position = "{}{}".format(self.canvas_echiquier.lettres_colonnes[colonne], int(self.canvas_echiquier.chiffres_rangees[self.canvas_echiquier.n_ligne- ligne - 1]))
+        return position
 
 if __name__ == '__main__':
     f = fenetre()
