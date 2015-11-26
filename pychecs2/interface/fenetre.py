@@ -5,6 +5,7 @@ from pychecs2.echecs.echiquier import *
 
 class canvas_echiquier(Canvas):
 
+
     def __init__(self, parent, n_pixels_par_case):
 
         self.n_ligne = 8
@@ -27,6 +28,7 @@ class canvas_echiquier(Canvas):
         super().__init__(parent, width = self.n_ligne*self.n_pixels_par_case,
                      height = self.n_colonne*self.n_pixels_par_case)
         self.bind('<Configure>', self.redimensionner)
+
     def dessiner_case(self):
 
         for i in range(self.n_ligne):
@@ -70,6 +72,8 @@ class canvas_echiquier(Canvas):
         self.delete('piece')
         self.dessiner_piece()
 
+
+
     def dessiner_piece(self):
 
         caracteres_pieces = {'PB': '\u2659',
@@ -111,6 +115,8 @@ class canvas_echiquier(Canvas):
             self.delete('piece')
             self.dessiner_piece()
 
+
+
 class fenetre(Tk,menu_global):
 
     def __init__(self):
@@ -142,7 +148,7 @@ class fenetre(Tk,menu_global):
         try:
             piece = self.canvas_echiquier.piece[position]
             self.position_selectionnee = position
-            self.messages['foreground'] = 'black'
+            self.messages['foreground'] = 'blue'
             self.messages['text'] = 'Pièce séléctionné : {} à la position {}'.format(piece, self.position_selectionnee)
             self.canvas_echiquier.changer_couleur_position(colonne, ligne)
             return position

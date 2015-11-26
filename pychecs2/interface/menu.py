@@ -5,15 +5,15 @@ class menu_global():
     def premier_menu(self):
         self.menu_bar= Menu()
         self.partie_menu = Menu(self.menu_bar, tearoff = 0)
-        self.partie_menu.add_command(label= 'Nouvelle partie', command = lambda:self.quit)
+        self.partie_menu.add_command(label= 'Nouvelle partie', command = lambda:self.nouvelle_partie())
         self.partie_menu.add_command(label= 'Ouvrir une partie', command = lambda:self.quit)
         self.partie_menu.add_command(label= 'Sauvegarder la partie', command = lambda:self.menu_enregistrer())
-        self.partie_menu.add_command(label= 'Quitter', command = lambda:self.quit)
+        self.partie_menu.add_command(label= 'Quitter', command = lambda:self.quitter())
 
 
         self.affichage_menu = Menu(tearoff = 0)
         #################################
-        self.affichage_menu.add_command(label= 'Modifier', command =lambda: self.canvas_echiquier.changer_couleur_theme(1,'green'))
+        self.affichage_menu.add_command(label= 'Modifier', command =lambda: self.canvas_echiquier.changer_couleur_theme(2,'green'))
         self.affichage_menu.add_command(label= 'résolution',command = lambda:self.quit)
 
 
@@ -71,6 +71,48 @@ class menu_global():
         self.messages_confirme.grid(padx= 10, pady= 10)
         self.bouton_ok = Button(self.confirme,text="ok",width=10, command =self.confirme.destroy)
         self.bouton_ok.grid(pady= 10)
+
+    def nouvelle_partie(self):
+        self.popup=Toplevel()
+        self.popup.title("Nouvelle Partie")
+        self.messages_nouvelle = Label(self.popup)
+        self.messages_nouvelle['text'] = "Voulez-vous commencer une nouvelle partie?"
+        self.messages_nouvelle.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
+        self.entree = Entry(self.popup,width=40)
+
+
+
+        self.bouton_nouvelle = Button(self.popup,text="Nouvelle Partie", command =lambda:self.supprimer_partie(self.entree.get()))
+        self.bouton_annuler = Button(self.popup, text="Annuler", command = self.popup.destroy)
+        self.bouton_nouvelle.grid(column = 0, row = 2, pady= 10)
+        self.bouton_annuler.grid(column = 1, row = 2)
+
+    #def supprimer_partie(self):
+        #self.delete('case')
+        #self.dessiner_case()
+        #self.delete('piece')
+        #self.dessiner_piece()
+
+    def quitter(self):
+        self.popup=Toplevel()
+        self.popup.title("Quitter Partie")
+        self.messages_nouvelle = Label(self.popup)
+        self.messages_nouvelle['text'] = "Voulez-vous sauvegarder la partie avant de quitter?"
+        self.messages_nouvelle.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
+        self.entree = Entry(self.popup,width=40)
+        self.entree.grid(column = 0,columnspan = 2, row = 1, pady= 5)
+
+        self.entree.insert(0, "partie_echec")
+
+        self.bouton_sauvegarder = Button(self.popup,text="Sauvegarder", command =lambda:self.sauvegarder_partie(self.entree.get()))
+        self.bouton_quitter = Button(self.popup, text="Quitter", command = self.popup.destroy)
+        self.bouton_sauvegarder.grid(column = 0, row = 2, pady= 10)
+        self.bouton_quitter.grid(column = 1, row = 2)
+
+
+
+
+
 
 
 

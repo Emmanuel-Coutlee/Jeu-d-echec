@@ -144,6 +144,7 @@ class Pion(Piece):
         if self.est_blanc():
             if rangee_cible == (rangee_source+1):
                 if colonne_cible == (colonne_source+1):
+
                     return True
 
                 if colonne_cible == (colonne_source-1):
