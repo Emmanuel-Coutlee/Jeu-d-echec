@@ -38,22 +38,23 @@ class menu_global():
         self.messages_sauvegarde = Label(self.popup)
         self.messages_sauvegarde['text'] = "Entrez le nom du ficher pour la partie à enregistrer"
         self.messages_sauvegarde.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
-        self.nom_fichier = Entry(self.popup,width=40)
-        self.nom_fichier.grid(column = 0,columnspan = 2, row = 1, pady= 5)
+        self.entree = Entry(self.popup,width=40)
+        self.entree.grid(column = 0,columnspan = 2, row = 1, pady= 5)
 
-        self.nom_fichier.delete(0, END)
-        self.nom_fichier.insert(0, "partie_echec")
+        self.entree.insert(0, "partie_echec")
 
-        self.bouton_sauvegarder = Button(self.popup,text="Sauvegarder", command =lambda:self.sauvegarder_partie(self.nom_fichier))
+        self.bouton_sauvegarder = Button(self.popup,text="Sauvegarder", command =lambda:self.sauvegarder_partie(self.entree.get()))
         self.bouton_annuler = Button(self.popup, text="Annuler", command = self.popup.destroy)
         self.bouton_sauvegarder.grid(column = 0, row = 2, pady= 10)
         self.bouton_annuler.grid(column = 1, row = 2)
 
 
     def sauvegarder_partie(self, nom_fichier):
-        fichier_ecriture = open("nom_fichier", 'w',encoding="utf-8")
-        for element in self.canvas_echiquier.piece:
-            piece = str("{}".format(element))
+        fichier_ecriture = open(nom_fichier, 'w',encoding="utf-8")
+        #echiquier.Echiquier.initialiser_echiquier_depart.dictionnaire_pieces
+        dictionaire = self.canvas_echiquier.piece
+        for element in dictionaire:
+            piece = str("{} {}".format(element, dictionaire[element]))
             fichier_ecriture.write(piece)
 
         #On fait un retour de chariot dans le fichier de sortie pour séparer les entiers chiffrés dans le fichier.
