@@ -2,6 +2,7 @@ from tkinter import *
 from time import strftime, localtime
 from pychecs2.echecs import echiquier
 
+
 class menu_global():
     def premier_menu(self):
         self.menu_bar= Menu()
@@ -48,17 +49,23 @@ class menu_global():
         self.bouton_sauvegarder.grid(column = 0, row = 2, pady= 10)
         self.bouton_annuler.grid(column = 1, row = 2)
 
-    def menu_charger(self):
+    def menu_charger(self, nom_fichier):
         self.popup = Toplevel()
         self.popup.title("Charger une partie")
         self.messages_charger = Label(self.popup)
         self.messages_charger['text'] = "Choissez une partie à charger."
         self.messages_charger.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
-        fichier_liste_partie = open("liste_partie", 'r',encoding="utf-8")
-        self.nom_partie = ""
-        for partie in fichier_liste_partie():
-            choisir_partie = Radiobutton(self.popup, text= partie,variable = self.nom_partie,value = partie,indicatoron=0, anchor = CENTER)
+        fichier_charge= open(nom_fichier, 'r',encoding="utf-8")
+        fichier_liste_partie = fichier_charge.readline()
+        nom_fichier = self.sauvegarder_partie(fichier_liste_partie)
+        liste_partie = []
+
+        for partie in nom_fichier():
+            choisir_partie = Radiobutton(self.popup, text= partie,variable = nom_fichier,value = partie,indicatoron=0, anchor = CENTER)
+            liste_partie.append(echiquier.echiquier.dictionnaire_pieces)
             choisir_partie.grid(column = 0,columnspan = 2,padx= 10, pady= 10)
+
+
         self.bouton_charger = Button(self.popup,text="Charger", command =lambda:self.charger_partie(self.nom_partie.get()))
         self.bouton_annuler = Button(self.popup, text="Annuler", command = self.popup.destroy)
         self.bouton_charger.grid(column = 0, pady= 10, sticky = S)
@@ -78,33 +85,17 @@ class menu_global():
         self.bouton_annuler.grid(column = 2, row = 1, pady = 15)
 
 
-    def nouvelle_partie(self, sauvegarder):
-        if sauvegarder is True:
-            self.sauvegarder_partie()
+   # def nouvelle_partie(self, sauvegarder,):
+        #if sauvegarder is True:
+            #self.sauvegarder_partie()
+        #elif:
+            #self.nouvelle_partie()
+            #del.echiquier.piec
+            #self.dessiner
 
-        #self.delete('case')
-        #self.dessiner_case()
-        #self.delete('piece')
-        #self.dessiner_piece()
 
-        #lancer la nouvelle partie
 
-    def quitter(self):
 
-        self.popup=Toplevel()
-        self.popup.title("Quitter Partie")
-        self.messages_nouvelle = Label(self.popup)
-        self.messages_nouvelle['text'] = "Voulez-vous sauvegarder la partie avant de quitter?"
-        self.messages_nouvelle.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
-        self.entree = Entry(self.popup,width=40)
-        self.entree.grid(column = 0,columnspan = 2, row = 1, pady= 5)
-
-        self.entree.insert(0, "partie_echec")
-
-        self.bouton_sauvegarder = Button(self.popup,text="Sauvegarder", command =lambda:self.sauvegarder_partie(self.entree.get()))
-        self.bouton_quitter = Button(self.popup, text="Quitter", command = self.popup.destroy)
-        self.bouton_sauvegarder.grid(column = 0, row = 2, pady= 10)
-        self.bouton_quitter.grid(column = 1, row = 2)
 
     def sauvegarder_partie(self, nom_fichier):
         fichier_ecriture = open(nom_fichier,'w',encoding="utf-8")
@@ -130,6 +121,23 @@ class menu_global():
         self.messages_confirme.grid(padx= 10, pady= 10)
         self.bouton_ok = Button(self.confirme,text="ok",width=10, command =self.confirme.destroy)
         self.bouton_ok.grid(pady= 10)
+
+    def quitter(self):
+
+        self.popup=Toplevel()
+        self.popup.title("Quitter Partie")
+        self.messages_nouvelle = Label(self.popup)
+        self.messages_nouvelle['text'] = "Voulez-vous sauvegarder la partie avant de quitter?"
+        self.messages_nouvelle.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
+        self.entree = Entry(self.popup,width=40)
+        self.entree.grid(column = 0,columnspan = 2, row = 1, pady= 5)
+
+        self.entree.insert(0, "partie_echec")
+
+        self.bouton_sauvegarder = Button(self.popup,text="Sauvegarder", command =lambda:self.sauvegarder_partie(self.entree.get()))
+        self.bouton_quitter = Button(self.popup, text="Quitter", command = self.popup.destroy)
+        self.bouton_sauvegarder.grid(column = 0, row = 2, pady= 10)
+        self.bouton_quitter.grid(column = 1, row = 2)
 
 
 

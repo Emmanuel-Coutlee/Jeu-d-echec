@@ -140,7 +140,7 @@ class fenetre(Tk,menu_global):
 
         self.premier_menu()
 
-    def selectionner_piece(self,event):
+    def selectionner_piece(self, event):
         ligne = event.y // self.canvas_echiquier.n_pixels_par_case
         colonne = event.x // self.canvas_echiquier.n_pixels_par_case
         position = "{}{}".format(self.canvas_echiquier.lettres_colonnes[colonne], int(self.canvas_echiquier.chiffres_rangees[self.canvas_echiquier.n_ligne- ligne - 1]))
@@ -156,6 +156,7 @@ class fenetre(Tk,menu_global):
             self.messages['foreground'] = 'red'
             self.messages['text'] = 'erreur aucune piece ici'
             return None
+
 
     def selectionner_arriver(self, event):
         ligne = event.y // self.canvas_echiquier.n_pixels_par_case
