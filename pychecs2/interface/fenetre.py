@@ -52,11 +52,11 @@ class Canvas_echiquier(Canvas):
         self.create_rectangle(x_coin_superieur_gauche, y_coin_superieur_gauche,
                             x_coin_inferieur_droit, y_coin_inferieur_droit, fill = 'yellow', tag = 'selection')
 
-        self.delete('piece')
         self.dessiner_piece()
 
     def supprimer_selection(self):
         self.delete('selection')
+
 
     def changer_couleur_theme(self, type, couleur):
         if type == 1:
@@ -66,13 +66,12 @@ class Canvas_echiquier(Canvas):
         self.delete('case')
         self.dessiner_case()
 
-        self.delete('piece')
         self.dessiner_piece()
 
 
 
     def dessiner_piece(self):
-
+        self.delete('piece')
         for position, type_piece in self.partie.echiquier.dictionnaire_pieces.items():
 
             coordonnee_y = (self.n_ligne - self.chiffres_rangees.index(position[1]) - 1) * self.n_pixels_par_case + self.n_pixels_par_case // 2
@@ -109,6 +108,8 @@ class fenetre(Tk,menu_global):
         self.partie = Partie()
 
         self.partie.echiquier.deplacer('a2','a4')
+
+        self.joueur_actif = 'blanc'
 
         self.title("Échiquier")
         self.piece_selectionner = None
@@ -161,7 +162,11 @@ class fenetre(Tk,menu_global):
                 self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
                 self.position_arriver_selectionnee = position
                 self.partie.echiquier.deplacer(self.position_depart_selectionnee,self.position_arriver_selectionnee)
-
+                self.Canvas_echiquier.dessiner_piece()
+                self.piece_selectionner = None
+                self.messages['text'] = ' '
+                self.Canvas_echiquier.supprimer_selection()
+                self.partie.joueur_suivant()
 
 
     def selectionner_arriver(self, event):
