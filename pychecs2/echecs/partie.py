@@ -4,7 +4,7 @@ dont un objet échiquier (une instance de la classe Echiquier).
 
 """
 from pychecs2.echecs.echiquier import Echiquier
-from pychecs2.interface.fenetre import *
+#from pychecs2.interface.fenetre import *
 
 
 class Partie:

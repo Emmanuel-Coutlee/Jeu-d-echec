@@ -1,28 +1,22 @@
 from tkinter import Canvas,Tk, Label, NSEW, Menu, Button
 import time
 from pychecs2.interface.menu import *
-from pychecs2.echecs.echiquier import *
+from pychecs2.echecs.partie import Partie
 
-class canvas_echiquier(Canvas):
+class Canvas_echiquier(Canvas):
 
 
-    def __init__(self, parent, n_pixels_par_case):
+    def __init__(self, parent, n_pixels_par_case, la_partie):
 
         self.n_ligne = 8
         self.n_colonne = 8
         self.n_pixels_par_case = n_pixels_par_case
         self.couleur_1 = 'white'
         self.couleur_2 = 'gray'
+        self.partie = la_partie
 
         self.chiffres_rangees = ['1', '2', '3', '4', '5', '6', '7', '8']
         self.lettres_colonnes = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-
-        self.piece = {
-            'a1': 'TB', 'b1': 'CB', 'c1': 'FB', 'd1': 'DB', 'e1': 'RB', 'f1': 'FB', 'g1': 'CB', 'h1': 'TB',
-            'a2': 'PB', 'b2': 'PB', 'c2': 'PB', 'd2': 'PB', 'e2': 'PB', 'f2': 'PB', 'g2': 'PB', 'h2': 'PB',
-            'a7': 'PN', 'b7': 'PN', 'c7': 'PN', 'd7': 'PN', 'e7': 'PN', 'f7': 'PN', 'g7': 'PN', 'h7': 'PN',
-            'a8': 'TN', 'b8': 'CN', 'c8': 'FN', 'd8': 'DN', 'e8': 'RN', 'f8': 'FN', 'g8': 'CN', 'h8': 'TN',
-        }
 
 
         super().__init__(parent, width = self.n_ligne*self.n_pixels_par_case,
@@ -61,6 +55,8 @@ class canvas_echiquier(Canvas):
         self.delete('piece')
         self.dessiner_piece()
 
+    def supprimer_selection(self):
+        self.delete('selection')
 
     def changer_couleur_theme(self, type, couleur):
         if type == 1:
@@ -77,27 +73,13 @@ class canvas_echiquier(Canvas):
 
     def dessiner_piece(self):
 
-        caracteres_pieces = {'PB': '\u2659',
-                             'PN': '\u265f',
-                             'TB': '\u2656',
-                             'TN': '\u265c',
-                             'CB': '\u2658',
-                             'CN': '\u265e',
-                             'FB': '\u2657',
-                             'FN': '\u265d',
-                             'RB': '\u2654',
-                             'RN': '\u265a',
-                             'DB': '\u2655',
-                             'DN': '\u265b'
-                             }
-
-        for position, type_piece in self.piece.items():
+        for position, type_piece in self.partie.echiquier.dictionnaire_pieces.items():
 
             coordonnee_y = (self.n_ligne - self.chiffres_rangees.index(position[1]) - 1) * self.n_pixels_par_case + self.n_pixels_par_case // 2
 
             coordonnee_x = self.lettres_colonnes.index(position[0]) * self.n_pixels_par_case + self.n_pixels_par_case // 2
 
-            self.create_text(coordonnee_x, coordonnee_y, text=caracteres_pieces[type_piece],
+            self.create_text(coordonnee_x, coordonnee_y, text=type_piece,
                              font=('Deja Vu', self.n_pixels_par_case//2), tags='piece')
 
     def redimensionner(self, event):
@@ -115,7 +97,7 @@ class canvas_echiquier(Canvas):
         # On supprime les anciennes pièces et on ajoute les nouvelles.
             self.delete('piece')
             self.dessiner_piece()
-
+        #if position_selectionner:
 
 
 class fenetre(Tk,menu_global):
@@ -124,44 +106,68 @@ class fenetre(Tk,menu_global):
         super().__init__()
         #self.background( colour = 'red')
 
+        self.partie = Partie()
+
+        self.partie.echiquier.deplacer('a2','a4')
 
         self.title("Échiquier")
-        self.position_selectionnee = None
+        self.piece_selectionner = None
 
         self.grid_columnconfigure(0, weight = 1)
         self.grid_rowconfigure(0, weight = 1)
 
-        self.canvas_echiquier = canvas_echiquier(self,60)
-        self.canvas_echiquier.grid(sticky=NSEW)
+        self.Canvas_echiquier = Canvas_echiquier(self, 60, self.partie)
+        self.Canvas_echiquier.grid(sticky=NSEW)
 
         self.messages = Label(self)
         self.messages.grid()
-        self.canvas_echiquier.bind('<Button-1>', self.selectionner_piece)
+        self.Canvas_echiquier.bind('<Button-1>', self.selectionner_piece)
+        self.Canvas_echiquier.bind('<Button-3>', self.deselectionner_piece)
 
         self.premier_menu()
 
-    def selectionner_piece(self, event):
-        ligne = event.y // self.canvas_echiquier.n_pixels_par_case
-        colonne = event.x // self.canvas_echiquier.n_pixels_par_case
-        position = "{}{}".format(self.canvas_echiquier.lettres_colonnes[colonne], int(self.canvas_echiquier.chiffres_rangees[self.canvas_echiquier.n_ligne- ligne - 1]))
+    def deselectionner_piece(self, event):
+        self.piece_selectionner = None
+        self.Canvas_echiquier.supprimer_selection()
+        self.messages['text'] = ' '
 
-        try:
-            piece = self.canvas_echiquier.piece[position]
-            self.position_selectionnee = position
-            self.messages['foreground'] = 'blue'
-            self.messages['text'] = 'Pièce séléctionné : {} à la position {}'.format(piece, self.position_selectionnee)
-            self.canvas_echiquier.changer_couleur_position(colonne, ligne)
-            return position
-        except KeyError:
-            self.messages['foreground'] = 'red'
-            self.messages['text'] = 'erreur aucune piece ici'
-            return None
+    def selectionner_piece(self, event):
+        ligne = event.y // self.Canvas_echiquier.n_pixels_par_case
+        colonne = event.x // self.Canvas_echiquier.n_pixels_par_case
+        position = "{}{}".format(self.Canvas_echiquier.lettres_colonnes[colonne], int(self.Canvas_echiquier.chiffres_rangees[self.Canvas_echiquier.n_ligne- ligne - 1]))
+        if self.piece_selectionner is None:
+            try:
+                piece = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
+                self.position_depart_selectionnee = position
+                self.messages['foreground'] = 'blue'
+                self.messages['text'] = 'Pièce séléctionné : {} à la position {}'.format(piece, self.position_depart_selectionnee)
+                self.piece_selectionner = piece
+                self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
+                return position
+            except KeyError:
+                self.messages['foreground'] = 'red'
+                self.messages['text'] = 'erreur aucune piece ici'
+                return None
+
+        else:
+            if self.Canvas_echiquier.partie.echiquier.recuperer_piece_a_position(position) is not None:
+                piece = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
+                self.position_depart_selectionnee = position
+                self.messages['foreground'] = 'blue'
+                self.messages['text'] = 'Pièce séléctionné : {} à la position {}'.format(piece, self.position_depart_selectionnee)
+                self.piece_selectionner = piece
+                self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
+            else:
+                self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
+                self.position_arriver_selectionnee = position
+                self.partie.echiquier.deplacer(self.position_depart_selectionnee,self.position_arriver_selectionnee)
+
 
 
     def selectionner_arriver(self, event):
-        ligne = event.y // self.canvas_echiquier.n_pixels_par_case
-        colonne = event.x // self.canvas_echiquier.n_pixels_par_case
-        position = "{}{}".format(self.canvas_echiquier.lettres_colonnes[colonne], int(self.canvas_echiquier.chiffres_rangees[self.canvas_echiquier.n_ligne- ligne - 1]))
+        ligne = event.y // self.Canvas_echiquier.n_pixels_par_case
+        colonne = event.x // self.Canvas_echiquier.n_pixels_par_case
+        position = "{}{}".format(self.Canvas_echiquier.lettres_colonnes[colonne], int(self.Canvas_echiquier.chiffres_rangees[self.Canvas_echiquier.n_ligne- ligne - 1]))
         return position
 
 if __name__ == '__main__':

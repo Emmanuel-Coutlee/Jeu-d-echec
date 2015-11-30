@@ -1,6 +1,6 @@
 from tkinter import *
 from time import strftime, localtime
-from pychecs2.echecs import echiquier
+from pychecs2.echecs.partie import Partie
 
 
 class menu_global():
@@ -15,7 +15,8 @@ class menu_global():
 
         self.affichage_menu = Menu(tearoff = 0)
         #################################
-        self.affichage_menu.add_command(label= 'Modifier', command =lambda: self.canvas_echiquier.changer_couleur_theme(2,'green'))
+        #self.affichage_menu.add_command(label= 'Modifier', command =lambda: self.canvas_echiquier.changer_couleur_theme(2,'green'))
+        self.affichage_menu.add_command(label= 'Modifier', command =lambda: self.menu_modifier())
         self.affichage_menu.add_command(label= 'résolution',command = lambda:self.quit)
 
 
@@ -52,22 +53,29 @@ class menu_global():
     def menu_charger(self):
         self.popup = Toplevel()
         self.popup.title("Charger une partie")
-        self.messages_charger = Label(self.popup)
-        self.messages_charger['text'] = "Choissez une partie à charger."
-        self.messages_charger.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
-        fichier_liste_partie = open("liste_partie", 'r',encoding="utf-8")
-        self.nom_partie = ""
-        ligne_bouton = 1
-        frame_nom_partie = Frame(self.popup )
-        frame_nom_partie.grid()
-        for partie in fichier_liste_partie:
-            choisir_partie = Radiobutton(self.popup, text= partie,variable = self.nom_partie,value = partie,indicatoron=0)
-            choisir_partie.grid(column = 0,columnspan = 2,padx= 10, pady= 10)
-            ligne_bouton += 1
-        self.bouton_charger = Button(self.popup,text="Charger", command =lambda:self.charger_partie(self.nom_partie.get()))
-        self.bouton_annuler = Button(self.popup, text="Annuler", command = self.popup.destroy)
-        self.bouton_charger.grid(column = 0,row = ligne_bouton, pady= 10, sticky = S)
-        self.bouton_annuler.grid(column = 1,row = ligne_bouton, pady = 10, sticky = S )
+
+        try:
+            fichier_liste_partie = open("liste_partie2", 'r',encoding="utf-8")
+            self.messages_charger = Label(self.popup)
+            self.messages_charger['text'] = "Choissez une partie à charger."
+            self.messages_charger.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
+
+            self.nom_partie = ""
+            ligne_bouton = 2
+            frame_nom_partie = Frame(self.popup )
+            frame_nom_partie.grid()
+            for partie in fichier_liste_partie:
+                choisir_partie = Radiobutton(self.popup, text= partie,variable = self.nom_partie,value = partie,indicatoron=0)
+                choisir_partie.grid(column = 0,columnspan = 2,padx= 10, pady= 10)
+                ligne_bouton += 1
+            self.bouton_charger = Button(self.popup,text="Charger", command =lambda:self.charger_partie(self.nom_partie.get()))
+            self.bouton_annuler = Button(self.popup, text="Annuler", command = self.popup.destroy)
+            self.bouton_charger.grid(column = 0,row = ligne_bouton, pady= 10, sticky = S)
+            self.bouton_annuler.grid(column = 1,row = ligne_bouton, pady = 10, sticky = S )
+        except:
+            self.messages_charger = Label(self.popup)
+            self.messages_charger['text'] = "Il n'y a aucune partie sauvegardé."
+            self.messages_charger.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
 
     def menu_nouvelle_partie(self):
         self.popup = Toplevel()
@@ -115,25 +123,26 @@ class menu_global():
         self.popup=Toplevel()
         self.popup.title("modifier")
         self.messages_modifier = Label(self.popup)
-        self.messages_nouvelle['text'] = "Changez les couleurs des cases à votre goût "
-        self.messages_nouvelle.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
-        self.messages_modifier = Label(self.popup)
-        self.messages_nouvelle['text'] = "couleur des cases blanches "
-        self.messages_nouvelle.grid(column = 1, row = 0, pady= 10, padx = 15)
-        self.messages_modifier = Label(self.popup)
-        self.messages_nouvelle['text'] = "couleur des cases blanches "
-        self.messages_nouvelle.grid(column = 0, row = 1, pady= 10, padx = 15)
-
+        self.messages_modifier['text'] = "Changez les couleurs des cases à votre goût "
+        self.messages_modifier.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
+        self.messages_modifier_2 = Label(self.popup)
+        self.messages_modifier_2['text'] = "couleur des cases blanches "
+        self.messages_modifier_2.grid(column = 0, row = 1, pady= 10, padx = 15)
+        self.messages_modifier_3 = Label(self.popup)
+        self.messages_modifier_3['text'] = "couleur des cases noir "
+        self.messages_modifier_3.grid(column = 1, row = 1, pady= 10, padx = 15)
+        self.couleur_case_blanche = ""
+        self.couleur_case_noir = ""
         self.liste_couleur = ["red", "green", "bleu", "pink", "yellow"]
         for couleur in self.liste_couleur:
-            radio_couleur_blanc = Radiobutton(self.popup, text= "rouge",variable = self.couleur_case_blanche,value = couleur)
-            radio_couleur_noir = Radiobutton(self.popup, text= "rouge",variable = self.couleur_case_noir,value = couleur)
+            radio_couleur_blanc = Radiobutton(self.popup, text= couleur,variable = self.couleur_case_blanche,value = couleur)
+            radio_couleur_noir = Radiobutton(self.popup, text= couleur,variable = self.couleur_case_noir,value = couleur)
             radio_couleur_blanc.grid(column = 0,padx= 10, pady= 10)
             radio_couleur_noir.grid(column = 1,padx= 10, pady= 10)
 
     def sauvegarder_partie(self, nom_fichier):
         fichier_ecriture = open(nom_fichier,'w',encoding="utf-8")
-        fichier_liste_partie = open("liste_partie", 'w',encoding="utf-8")
+        fichier_liste_partie = open("liste_partie2", 'w',encoding="utf-8")
         fichier_liste_partie.write("{}\n".format(nom_fichier))
         #echiquier.Echiquier.initialiser_echiquier_depart.dictionnaire_pieces
         dictionaire = self.canvas_echiquier.piece
