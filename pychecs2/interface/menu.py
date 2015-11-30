@@ -95,11 +95,10 @@ class menu_global():
         if sauvegarder is True:
             self.menu_enregistrer()
 
-        self.fenetre.delete('case')
-        self.fenetre.delete('piece')
-        self.fenetre.dessiner_case()
-        self.fenetre.dessiner_piece()
 
+        self.Canvas_echiquier.partie.echiquier.initialiser_echiquier_depart()
+        self.Canvas_echiquier.dessiner_piece()
+        self.popup.destroy()
         #lancer la nouvelle partie
 
     def menu_quitter(self):
@@ -108,16 +107,18 @@ class menu_global():
         self.popup.title("Quitter Partie")
         self.messages_nouvelle = Label(self.popup)
         self.messages_nouvelle['text'] = "Voulez-vous sauvegarder la partie avant de quitter?"
-        self.messages_nouvelle.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
+        self.messages_nouvelle.grid(column = 0, columnspan = 3, row = 0, pady= 10, padx = 15)
         self.entree = Entry(self.popup,width=40)
-        self.entree.grid(column = 0,columnspan = 2, row = 1, pady= 5)
+        self.entree.grid(column = 0,columnspan = 3, row = 1, pady= 5)
 
         self.entree.insert(0, "partie_echec")
 
-        self.bouton_sauvegarder = Button(self.popup,text="Sauvegarder", command =lambda:self.sauvegarder_partie(self.entree.get()))
-        self.bouton_quitter = Button(self.popup, text="Quitter", command = self.popup.destroy)
+        self.bouton_sauvegarder = Button(self.popup,text="Oui", command =lambda:self.sauvegarder_partie(self.entree.get()),width = 10)
+        self.bouton_quitter = Button(self.popup, text="Non", command = self.quit,width = 10)
+        self.bouton_annuler = Button(self.popup, text="Annuler", command = self.popup.destroy,width = 10)
         self.bouton_sauvegarder.grid(column = 0, row = 2, pady= 10)
-        self.bouton_quitter.grid(column = 1, row = 2)
+        self.bouton_quitter.grid(column = 1, row = 2, pady= 10)
+        self.bouton_annuler.grid(column = 2, row = 2)
 
     def menu_modifier(self):
         self.popup=Toplevel()
