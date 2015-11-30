@@ -48,6 +48,7 @@ class canvas_echiquier(Canvas):
                                       x_coin_inferieur_droit, y_coin_inferieur_droit, fill = couleur, tag = 'case')
 
     def changer_couleur_position(self, colonne, ligne):
+        self.delete('selection')
         x_coin_superieur_gauche = colonne*self.n_pixels_par_case
         y_coin_superieur_gauche = ligne*self.n_pixels_par_case
         x_coin_inferieur_droit = colonne*self.n_pixels_par_case + self.n_pixels_par_case
@@ -55,7 +56,7 @@ class canvas_echiquier(Canvas):
 
 
         self.create_rectangle(x_coin_superieur_gauche, y_coin_superieur_gauche,
-                            x_coin_inferieur_droit, y_coin_inferieur_droit, fill = 'yellow', tag = 'case')
+                            x_coin_inferieur_droit, y_coin_inferieur_droit, fill = 'yellow', tag = 'selection')
 
         self.delete('piece')
         self.dessiner_piece()
@@ -122,7 +123,6 @@ class fenetre(Tk,menu_global):
     def __init__(self):
         super().__init__()
         #self.background( colour = 'red')
-
 
 
         self.title("Échiquier")

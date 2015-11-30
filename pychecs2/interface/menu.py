@@ -2,6 +2,7 @@ from tkinter import *
 from time import strftime, localtime
 from pychecs2.echecs import echiquier
 
+
 class menu_global():
     def premier_menu(self):
         self.menu_bar= Menu()
@@ -9,7 +10,7 @@ class menu_global():
         self.partie_menu.add_command(label= 'Nouvelle partie', command = lambda:self.menu_nouvelle_partie())
         self.partie_menu.add_command(label= 'Charger une partie', command = lambda:self.menu_charger())
         self.partie_menu.add_command(label= 'Sauvegarder la partie', command = lambda:self.menu_enregistrer())
-        self.partie_menu.add_command(label= 'Quitter', command = self.quitter())
+        self.partie_menu.add_command(label= 'Quitter', command = lambda:self.menu_quitter())
 
 
         self.affichage_menu = Menu(tearoff = 0)
@@ -56,13 +57,17 @@ class menu_global():
         self.messages_charger.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
         fichier_liste_partie = open("liste_partie", 'r',encoding="utf-8")
         self.nom_partie = ""
-        for partie in fichier_liste_partie():
-            choisir_partie = Radiobutton(self.popup, text= partie,variable = self.nom_partie,value = partie,indicatoron=0, anchor = CENTER)
+        ligne_bouton = 1
+        frame_nom_partie = Frame(self.popup )
+        frame_nom_partie.grid()
+        for partie in fichier_liste_partie:
+            choisir_partie = Radiobutton(self.popup, text= partie,variable = self.nom_partie,value = partie,indicatoron=0)
             choisir_partie.grid(column = 0,columnspan = 2,padx= 10, pady= 10)
+            ligne_bouton += 1
         self.bouton_charger = Button(self.popup,text="Charger", command =lambda:self.charger_partie(self.nom_partie.get()))
         self.bouton_annuler = Button(self.popup, text="Annuler", command = self.popup.destroy)
-        self.bouton_charger.grid(column = 0, pady= 10, sticky = S)
-        self.bouton_annuler.grid(column = 1, pady = 10, sticky = S )
+        self.bouton_charger.grid(column = 0,row = ligne_bouton, pady= 10, sticky = S)
+        self.bouton_annuler.grid(column = 1,row = ligne_bouton, pady = 10, sticky = S )
 
     def menu_nouvelle_partie(self):
         self.popup = Toplevel()
@@ -80,16 +85,16 @@ class menu_global():
 
     def nouvelle_partie(self, sauvegarder):
         if sauvegarder is True:
-            self.sauvegarder_partie()
+            self.menu_enregistrer()
 
-        #self.delete('case')
-        #self.dessiner_case()
-        #self.delete('piece')
-        #self.dessiner_piece()
+        self.fenetre.delete('case')
+        self.fenetre.delete('piece')
+        self.fenetre.dessiner_case()
+        self.fenetre.dessiner_piece()
 
         #lancer la nouvelle partie
 
-    def quitter(self):
+    def menu_quitter(self):
 
         self.popup=Toplevel()
         self.popup.title("Quitter Partie")
@@ -105,6 +110,26 @@ class menu_global():
         self.bouton_quitter = Button(self.popup, text="Quitter", command = self.popup.destroy)
         self.bouton_sauvegarder.grid(column = 0, row = 2, pady= 10)
         self.bouton_quitter.grid(column = 1, row = 2)
+
+    def menu_modifier(self):
+        self.popup=Toplevel()
+        self.popup.title("modifier")
+        self.messages_modifier = Label(self.popup)
+        self.messages_nouvelle['text'] = "Changez les couleurs des cases à votre goût "
+        self.messages_nouvelle.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
+        self.messages_modifier = Label(self.popup)
+        self.messages_nouvelle['text'] = "couleur des cases blanches "
+        self.messages_nouvelle.grid(column = 1, row = 0, pady= 10, padx = 15)
+        self.messages_modifier = Label(self.popup)
+        self.messages_nouvelle['text'] = "couleur des cases blanches "
+        self.messages_nouvelle.grid(column = 0, row = 1, pady= 10, padx = 15)
+
+        self.liste_couleur = ["red", "green", "bleu", "pink", "yellow"]
+        for couleur in self.liste_couleur:
+            radio_couleur_blanc = Radiobutton(self.popup, text= "rouge",variable = self.couleur_case_blanche,value = couleur)
+            radio_couleur_noir = Radiobutton(self.popup, text= "rouge",variable = self.couleur_case_noir,value = couleur)
+            radio_couleur_blanc.grid(column = 0,padx= 10, pady= 10)
+            radio_couleur_noir.grid(column = 1,padx= 10, pady= 10)
 
     def sauvegarder_partie(self, nom_fichier):
         fichier_ecriture = open(nom_fichier,'w',encoding="utf-8")
