@@ -118,8 +118,13 @@ class fenetre(Tk,menu_global):
         self.Canvas_echiquier = Canvas_echiquier(self, 60, self.partie)
         self.Canvas_echiquier.grid(sticky=NSEW)
 
-        self.messages = Label(self)
+        self.messages_joueur = Label(self)
+        self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
+        self.messages_joueur.grid()
+
+        self.messages= Label(self)
         self.messages.grid()
+
         self.Canvas_echiquier.bind('<Button-1>', self.selectionner_piece)
         self.Canvas_echiquier.bind('<Button-3>', self.deselectionner_piece)
         if self.Canvas_echiquier.partie.partie_terminee() == True:
@@ -130,7 +135,8 @@ class fenetre(Tk,menu_global):
         self.confirme = Toplevel()
         self.confirme.title("Partie Terminer")
         self.messages_confirme = Label(self.confirme)
-        self.messages_confirme['text'] = "Félicitation! le joueur actif à gagné la partie!"
+        self.messages_confirme['text'] = "Félicitation! le joueur actif à gagné la partie!".format(self.partie.joueur_actif)
+        self.messages_confirme.grid()
 
     def deselectionner_piece(self, event):
         self.piece_selectionner = None
@@ -145,21 +151,21 @@ class fenetre(Tk,menu_global):
             try:
                 piece = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
                 self.position_depart_selectionnee = position
+
                 self.messages['foreground'] = 'blue'
                 self.messages['text'] = 'Pièce séléctionné : {} à la position {}'.format(piece, self.position_depart_selectionnee)
                 self.couleur_piece_selectionner = self.Canvas_echiquier.partie.echiquier.couleur_piece_a_position(position)
                 if self.couleur_piece_selectionner != self.partie.joueur_actif:
-                    self.selectionner_piece()
+                    self.messages['foreground'] = 'red'
+                    self.messages['text'] = 'Tricheur'
+                    return None
                 self.piece_selectionner = piece
                 self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
                 return position
             except KeyError:
                 self.messages['foreground'] = 'red'
                 self.messages['text'] = 'erreur aucune piece ici'
-            except TypeError:
-                self.messages['foreground'] = 'red'
-                self.messages['text'] = 'Tricheur'
-                return None
+
 
         else:
             if self.Canvas_echiquier.partie.echiquier.recuperer_piece_a_position(position) is not None:
@@ -181,8 +187,9 @@ class fenetre(Tk,menu_global):
                 self.messages['text'] = ' '
                 self.Canvas_echiquier.supprimer_selection()
                 self.joueur_actif = self.partie.joueur_suivant()
+                self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
             else:
-                self.selectionner_piece()
+                return None
 
     def selectionner_arriver(self, event):
         ligne = event.y // self.Canvas_echiquier.n_pixels_par_case
