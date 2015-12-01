@@ -1,7 +1,7 @@
 from tkinter import *
 from time import strftime, localtime
 from pychecs2.echecs.partie import Partie
-import csv
+import pickle
 import os
 
 
@@ -57,6 +57,15 @@ class menu_global():
         self.popup.title("Charger une partie")
 
         try:
+            if os.stat("liste_partie").st_size ==0:
+                self.messages_charger = Label(self.popup)
+                self.messages_charger['text'] = "Il n'y a aucune partie sauvegardé."
+                self.messages_charger.grid(column = 0, row = 0, pady= 10, padx = 15)
+                self.bouton_ok = Button(self.popup,text="ok",width=10, command =self.popup.destroy)
+                self.bouton_ok.grid(pady= 10)
+                return None
+
+
             fichier_liste_partie = open("liste_partie", 'r',encoding="utf-8")
             self.messages_charger = Label(self.popup)
             self.messages_charger['text'] = "Choissez une partie à charger ou supprimer."
@@ -79,11 +88,13 @@ class menu_global():
         except FileNotFoundError:
             self.messages_charger = Label(self.popup)
             self.messages_charger['text'] = "Il n'y a aucune partie sauvegardé."
-            self.messages_charger.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
+            self.messages_charger.grid(column = 0, row = 0, pady= 10, padx = 15)
+            self.bouton_ok = Button(self.popup,text="ok",width=10, command =self.popup.destroy)
+            self.bouton_ok.grid(pady= 10)
 
     def suprimer_partie (self, nom_partie):
         try:
-            os.remove(nom_partie)
+            os.remove(nom_partie+".p")
             liste_partie = open("liste_partie", "r+")
             nom_liste_partie = liste_partie.readlines()
             liste_partie.seek(0,0)
@@ -165,32 +176,36 @@ class menu_global():
         else:
             fichier_liste_partie = open("liste_partie", 'a',encoding="utf-8")
         fichier_liste_partie.writelines("{}\n".format(nom_fichier))
-        fichier_ecriture = open(nom_fichier,'w',encoding="utf-8")
-        ecriture_csv = csv.writer(fichier_ecriture)
+
+        dictionaire = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces
+        pickle.dump(dictionaire, open(nom_fichier+".p",'wb'))
+
+        #ecriture_csv = csv.writer(fichier_ecriture)
 
         #echiquier.Echiquier.initialiser_echiquier_depart.dictionnaire_pieces
-        dictionaire = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces
-        for cle, valeur in dictionaire.items():
-            ecriture_csv.writerow([cle,valeur])
+        #dictionaire = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces
+        #for cle, valeur in dictionaire.items():
+            #ecriture_csv.writerow([cle,valeur])
             # piece = str("{} {}".format(cle, dictionaire[valeur]))
             #fichier_ecriture.write(piece)
 
         #On fait un retour de chariot dans le fichier de sortie pour séparer les entiers chiffrés dans le fichier.
             #fichier_ecriture.write("\n")
-        fichier_ecriture.close()
+        #fichier_ecriture.close()
+
         self.popup.destroy()
         self.confirmation(quitter)
 
     def charger_partie(self, nom_partie):
         #lire le ficher partie_echec
         try:
-            fichier_lecture = open(nom_partie,'r',encoding="utf-8")
+            #fichier_lecture = open(nom_partie,'r',encoding="utf-8")
 
-            self.dictionnaire_pieces = {}
+            self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces = pickle.load(open(nom_partie+".p","rb"))
 
-            for cle, valeur in csv.reader(fichier_lecture):
-                self.dictionnaire_pieces[cle]= eval(valeur)
-            fichier_lecture.close()
+            #for cle, valeur in csv.reader(fichier_lecture):
+                #self.dictionnaire_pieces[cle]= eval(valeur)
+            #fichier_lecture.close()
             self.Canvas_echiquier.dessiner_piece()
             self.popup.destroy()
         except FileNotFoundError:
@@ -202,10 +217,11 @@ class menu_global():
         self.messages_confirme = Label(self.confirme)
         self.messages_confirme['text'] = "La sauvegarde à été éffectué avec succès!"
         self.messages_confirme.grid(padx= 10, pady= 10)
-        self.bouton_ok = Button(self.confirme,text="ok",width=10, command =self.confirme.destroy)
-        self.bouton_ok.grid(pady= 10)
+        if quitter is False:
+            self.bouton_ok = Button(self.confirme,text="ok",width=10, command =self.confirme.destroy)
+            self.bouton_ok.grid(pady= 10)
         if quitter is True:
             self.bouton_ok = Button(self.confirme,text="ok",width=10, command =self.quit)
-
+            self.bouton_ok.grid(pady= 10)
 
 
