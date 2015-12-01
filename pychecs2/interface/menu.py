@@ -1,6 +1,8 @@
 from tkinter import *
 from time import strftime, localtime
 from pychecs2.echecs.partie import Partie
+import csv
+import os
 
 
 class menu_global():
@@ -9,7 +11,7 @@ class menu_global():
         self.partie_menu = Menu(self.menu_bar, tearoff = 0)
         self.partie_menu.add_command(label= 'Nouvelle partie', command = lambda:self.menu_nouvelle_partie())
         self.partie_menu.add_command(label= 'Charger une partie', command = lambda:self.menu_charger())
-        self.partie_menu.add_command(label= 'Sauvegarder la partie', command = lambda:self.menu_enregistrer())
+        self.partie_menu.add_command(label= 'Sauvegarder la partie', command = lambda:self.menu_enregistrer(False))
         self.partie_menu.add_command(label= 'Quitter', command = lambda:self.menu_quitter())
 
 
@@ -55,30 +57,47 @@ class menu_global():
         self.popup.title("Charger une partie")
 
         try:
-            fichier_liste_partie = open("liste_partie2", 'r',encoding="utf-8")
+            fichier_liste_partie = open("liste_partie", 'r',encoding="utf-8")
             self.messages_charger = Label(self.popup)
-            self.messages_charger['text'] = "Choissez une partie à charger."
-            self.messages_charger.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
+            self.messages_charger['text'] = "Choissez une partie à charger ou supprimer."
+            self.messages_charger.grid(column = 0, columnspan = 3, row = 0, pady= 10, padx = 15)
 
-            self.nom_partie = ""
+            self.nom_partie = StringVar()
             ligne_bouton = 2
             frame_nom_partie = Frame(self.popup )
             frame_nom_partie.grid()
             for partie in fichier_liste_partie:
-                choisir_partie = Radiobutton(self.popup, text= partie,variable = self.nom_partie,value = partie,indicatoron=0)
-                choisir_partie.grid(column = 0,columnspan = 2,padx= 10, pady= 10)
+                choisir_partie = Radiobutton(self.popup, text= partie.rstrip(),variable = self.nom_partie,value = partie.rstrip(),indicatoron=0)
+                choisir_partie.grid(column = 0,columnspan = 3,padx= 10, pady= 10)
                 ligne_bouton += 1
             self.bouton_charger = Button(self.popup,text="Charger", command =lambda:self.charger_partie(self.nom_partie.get()))
+            self.bouton_suprimer = Button(self.popup,text="suprimer", command =lambda:self.suprimer_partie(self.nom_partie.get()))
             self.bouton_annuler = Button(self.popup, text="Annuler", command = self.popup.destroy)
             self.bouton_charger.grid(column = 0,row = ligne_bouton, pady= 10, sticky = S)
-            self.bouton_annuler.grid(column = 1,row = ligne_bouton, pady = 10, sticky = S )
-        except:
+            self.bouton_suprimer.grid(column = 1,row = ligne_bouton, pady= 10, sticky = S)
+            self.bouton_annuler.grid(column = 2,row = ligne_bouton, pady = 10, sticky = S )
+        except FileNotFoundError:
             self.messages_charger = Label(self.popup)
             self.messages_charger['text'] = "Il n'y a aucune partie sauvegardé."
             self.messages_charger.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
 
-    def charger_partie(self, nom_partie):
-        #lire le ficher partie_echec
+    def suprimer_partie (self, nom_partie):
+        try:
+            os.remove(nom_partie)
+            liste_partie = open("liste_partie", "r+")
+            nom_liste_partie = liste_partie.readlines()
+            liste_partie.seek(0,0)
+            for line in nom_liste_partie:
+                if line != nom_partie+"\n":
+                    liste_partie.write(line)
+            liste_partie.truncate()
+            liste_partie.close()
+            self.popup.destroy()
+            self.menu_charger()
+        except FileNotFoundError:
+            self.messages_charger['text'] = "***ATTENTION!***\nVous n'avez sélectionné aucune partie.\nVeuillez choisir une partie."
+
+
 
     def menu_nouvelle_partie(self):
         self.popup = Toplevel()
@@ -141,20 +160,41 @@ class menu_global():
             radio_couleur_noir.grid(column = 1,padx= 10, pady= 10)
 
     def sauvegarder_partie(self, nom_fichier,quitter):
+        if not os.path.exists("liste_partie"):
+            fichier_liste_partie = open("liste_partie", 'w',encoding="utf-8")
+        else:
+            fichier_liste_partie = open("liste_partie", 'a',encoding="utf-8")
+        fichier_liste_partie.writelines("{}\n".format(nom_fichier))
         fichier_ecriture = open(nom_fichier,'w',encoding="utf-8")
-        fichier_liste_partie = open("liste_partie2", 'w',encoding="utf-8")
-        fichier_liste_partie.write("{}\n".format(nom_fichier))
+        ecriture_csv = csv.writer(fichier_ecriture)
+
         #echiquier.Echiquier.initialiser_echiquier_depart.dictionnaire_pieces
         dictionaire = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces
-        for element in dictionaire:
-            piece = str("{} {}".format(element, dictionaire[element]))
-            fichier_ecriture.write(piece)
+        for cle, valeur in dictionaire.items():
+            ecriture_csv.writerow([cle,valeur])
+            # piece = str("{} {}".format(cle, dictionaire[valeur]))
+            #fichier_ecriture.write(piece)
 
         #On fait un retour de chariot dans le fichier de sortie pour séparer les entiers chiffrés dans le fichier.
-            fichier_ecriture.write("\n")
+            #fichier_ecriture.write("\n")
         fichier_ecriture.close()
         self.popup.destroy()
         self.confirmation(quitter)
+
+    def charger_partie(self, nom_partie):
+        #lire le ficher partie_echec
+        try:
+            fichier_lecture = open(nom_partie,'r',encoding="utf-8")
+
+            self.dictionnaire_pieces = {}
+
+            for cle, valeur in csv.reader(fichier_lecture):
+                self.dictionnaire_pieces[cle]= eval(valeur)
+            fichier_lecture.close()
+            self.Canvas_echiquier.dessiner_piece()
+            self.popup.destroy()
+        except FileNotFoundError:
+            self.messages_charger['text'] = "***ATTENTION!***\nVous n'avez sélectionné aucune partie.\nVeuillez choisir une partie."
 
     def confirmation(self,quitter):
         self.confirme = Toplevel()
