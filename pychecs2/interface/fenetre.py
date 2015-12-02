@@ -177,7 +177,7 @@ class fenetre(Tk,menu_global):
                     self.piece_selectionner = piece
                     self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
 
-            self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
+            #self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
             self.position_arriver_selectionnee = position
 
             if self.partie.echiquier.deplacer(self.position_depart_selectionnee,self.position_arriver_selectionnee) is True:

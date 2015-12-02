@@ -171,6 +171,11 @@ class menu_global():
             radio_couleur_noir.grid(column = 1,padx= 10, pady= 10)
 
     def sauvegarder_partie(self, nom_fichier,quitter):
+
+        if os.path.exists(nom_fichier+".p"):
+            self.menu_ecraser_partie(nom_fichier, quitter)
+            return None
+
         if not os.path.exists("liste_partie"):
             fichier_liste_partie = open("liste_partie", 'w',encoding="utf-8")
         else:
@@ -178,6 +183,7 @@ class menu_global():
         fichier_liste_partie.writelines("{}\n".format(nom_fichier))
 
         dictionaire = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces
+
         pickle.dump(dictionaire, open(nom_fichier+".p",'wb'))
 
         #ecriture_csv = csv.writer(fichier_ecriture)
@@ -193,6 +199,25 @@ class menu_global():
             #fichier_ecriture.write("\n")
         #fichier_ecriture.close()
 
+        self.popup.destroy()
+        self.confirmation(quitter)
+
+    def menu_ecraser_partie(self,nom_fichier,quitter):
+        self.popup_ecraser=Toplevel()
+        self.popup_ecraser.title("Écraser une partie")
+        self.messages_modifier = Label(self.popup_ecraser)
+        self.messages_modifier['text'] = "Une partie avec ce nom existe déjà. Voulez-vous l'écraser ou choisir un nouveau nom?"
+        self.messages_modifier.grid(column = 0, columnspan = 2,pady= 10, padx = 10)
+        self.bouton_sauvegarder = Button(self.popup_ecraser,text="Écraser", command =lambda:self.ecraser_partie(nom_fichier,quitter),width = 10)
+        self.bouton_annuler = Button(self.popup_ecraser, text="Changer le nom", command = self.popup_ecraser.destroy,width = 15)
+        self.bouton_sauvegarder.grid(column = 0, row = 1, pady= 10)
+        self.bouton_annuler.grid(column = 1, row = 1)
+
+    def ecraser_partie(self,nom_fichier, quitter):
+        dictionaire = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces
+
+        pickle.dump(dictionaire, open(nom_fichier+".p",'wb'))
+        self.popup_ecraser.destroy()
         self.popup.destroy()
         self.confirmation(quitter)
 
