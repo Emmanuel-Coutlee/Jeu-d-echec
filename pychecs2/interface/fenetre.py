@@ -15,8 +15,13 @@ class Canvas_echiquier(Canvas):
         self.couleur_2 = 'gray'
         self.partie = la_partie
 
-        self.chiffres_rangees = ['1', '2', '3', '4', '5', '6', '7', '8']
-        self.lettres_colonnes = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+        self.piece_blanc_perdu = ""
+        self.piece_noir_perdu = ""
+
+        self.liste_mouvement_effectuer = []
+
+        #self.chiffres_rangees = ['1', '2', '3', '4', '5', '6', '7', '8']
+        #self.lettres_colonnes = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
 
         super().__init__(parent, width = self.n_ligne*self.n_pixels_par_case,
@@ -74,9 +79,9 @@ class Canvas_echiquier(Canvas):
         self.delete('piece')
         for position, type_piece in self.partie.echiquier.dictionnaire_pieces.items():
 
-            coordonnee_y = (self.n_ligne - self.chiffres_rangees.index(position[1]) - 1) * self.n_pixels_par_case + self.n_pixels_par_case // 2
+            coordonnee_y = (self.n_ligne - self.partie.echiquier.chiffres_rangees.index(position[1]) - 1) * self.n_pixels_par_case + self.n_pixels_par_case // 2
 
-            coordonnee_x = self.lettres_colonnes.index(position[0]) * self.n_pixels_par_case + self.n_pixels_par_case // 2
+            coordonnee_x = self.partie.echiquier.lettres_colonnes.index(position[0]) * self.n_pixels_par_case + self.n_pixels_par_case // 2
 
             self.create_text(coordonnee_x, coordonnee_y, text=type_piece,
                              font=('Deja Vu', self.n_pixels_par_case//2), tags='piece')
@@ -115,15 +120,39 @@ class fenetre(Tk,menu_global):
         self.grid_columnconfigure(0, weight = 1)
         self.grid_rowconfigure(0, weight = 1)
 
+        self.affiche_liste_rangee = Label(self)
+        self.affiche_liste_rangee['text'] = "8\n\n\n7\n\n\n6\n\n\n5\n\n\n4\n\n\n3\n\n\n2\n\n\n1"
+        self.affiche_liste_rangee.grid(column= 0,row =0 )
+
+        self.affiche_liste_rangee = Label(self)
+        self.affiche_liste_rangee['text'] = "     a            b             c             d             e             f             g             h"
+        self.affiche_liste_rangee.grid(column= 1,row =4 )
+
         self.Canvas_echiquier = Canvas_echiquier(self, 60, self.partie)
-        self.Canvas_echiquier.grid(sticky=NSEW)
+        self.Canvas_echiquier.grid(sticky=NSEW,column = 1 ,row=0,columnspan = 3, rowspan= 4)
 
         self.messages_joueur = Label(self)
         self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
-        self.messages_joueur.grid()
+        self.messages_joueur.grid(columnspan = 3, row = 5)
 
         self.messages= Label(self)
-        self.messages.grid()
+        self.messages.grid( columnspan= 3, row=6)
+
+        self.messages_piece = Label(self)
+        self.messages_piece['text'] = "Pièces qui on été manger:"
+        self.messages_piece.grid(column= 1,row =7 )
+
+        self.messages_piece_blanc = Label(self)
+        self.messages_piece_blanc['text'] = "Pièce blanc:"
+        self.messages_piece_blanc.grid(column= 1, row=8)
+        self.messages_piece_noir = Label(self)
+        self.messages_piece_noir['text'] = "Pièce noir:"
+        self.messages_piece_noir.grid(column= 1,row =9)
+
+
+        self.frame_droite = Frame(self)
+        self.frame_droite.grid(column = 4)
+
 
         self.Canvas_echiquier.bind('<Button-1>', self.selectionner_piece)
         self.Canvas_echiquier.bind('<Button-3>', self.deselectionner_piece)
@@ -131,12 +160,31 @@ class fenetre(Tk,menu_global):
             self.annoncer_partie_gagner()
         self.premier_menu()
 
+    def frame_droite(self):
+
+        self.messages_temps_jeu = Label(self.frame_droite)
+        self.messages_temps_jeu['text'] = "Temps de jeu"
+        self.messages_temps_jeu.grid(column= 3,row=0 , sticky = N,padx= 10)
+
+        self.messages_temps_jeu_blanc = Label(self.frame_droite)
+        self.messages_temps_jeu_blanc['text'] = "Pièce blanc:"
+        self.messages_temps_jeu_blanc.grid(column= 3, row = 1)
+        self.messages_temps_jeu_noir = Label(self.frame_droite)
+        self.messages_temps_jeu_noir['text'] = "Pièce noir:"
+        self.messages_temps_jeu_noir.grid(column=3, row=2,sticky = N)
+
     def annoncer_partie_gagner(self):
-        self.confirme = Toplevel()
-        self.confirme.title("Partie Terminer")
-        self.messages_confirme = Label(self.confirme)
-        self.messages_confirme['text'] = "Félicitation! le joueur actif à gagné la partie!".format(self.partie.joueur_actif)
-        self.messages_confirme.grid()
+        self.gagner = Toplevel()
+        self.gagner.title("Partie Terminer")
+        self.messages_gagner = Label(self.gagner)
+        self.messages_gagner['text'] = "Félicitation! le {} à gagné la partie!\n Voulez-vous jouer une nouvelle partie?".format(self.partie.joueur_actif)
+        self.messages_gagner.grid(columnspan = 2)
+
+        self.bouton_nouvelle = Button(self.popup,text="Oui", command =lambda:self.nouvelle_partie(False),width = 10)
+        self.bouton_quitter = Button(self.popup, text="Non, quitter", command = self.quit,width = 10)
+        self.bouton_nouvelle.grid(column = 0, row = 1, pady= 10)
+        self.bouton_quitter.grid(column = 1, row = 1, pady= 10)
+
 
     def deselectionner_piece(self, event):
         self.piece_selectionner = None
@@ -146,7 +194,7 @@ class fenetre(Tk,menu_global):
     def selectionner_piece(self, event):
         ligne = event.y // self.Canvas_echiquier.n_pixels_par_case
         colonne = event.x // self.Canvas_echiquier.n_pixels_par_case
-        position = "{}{}".format(self.Canvas_echiquier.lettres_colonnes[colonne], int(self.Canvas_echiquier.chiffres_rangees[self.Canvas_echiquier.n_ligne- ligne - 1]))
+        position = "{}{}".format(self.Canvas_echiquier.partie.echiquier.lettres_colonnes[colonne], int(self.Canvas_echiquier.partie.echiquier.chiffres_rangees[self.Canvas_echiquier.n_ligne- ligne - 1]))
         if self.piece_selectionner is None:
             try:
                 piece = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
@@ -157,7 +205,7 @@ class fenetre(Tk,menu_global):
                 self.couleur_piece_selectionner = self.Canvas_echiquier.partie.echiquier.couleur_piece_a_position(position)
                 if self.couleur_piece_selectionner != self.partie.joueur_actif:
                     self.messages['foreground'] = 'red'
-                    self.messages['text'] = 'Tricheur'
+                    self.messages['text'] = "Vous essayer de jouer une pièce de l'autre joueur TRICHEUR!"
                     return None
                 self.piece_selectionner = piece
                 self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
@@ -168,34 +216,53 @@ class fenetre(Tk,menu_global):
 
 
         else:
-            if self.Canvas_echiquier.partie.echiquier.recuperer_piece_a_position(position) is not None:
-                if self.couleur_piece_selectionner == self.Canvas_echiquier.partie.echiquier.couleur_piece_a_position(position):
-                    piece = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
-                    self.position_depart_selectionnee = position
-                    self.messages['foreground'] = 'blue'
-                    self.messages['text'] = 'Pièce séléctionné : {} à la position {}'.format(piece, self.position_depart_selectionnee)
-                    self.piece_selectionner = piece
-                    self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
+            self.selectionner_arriver(ligne, colonne)
+
+    def selectionner_arriver(self, ligne, colonne):
+        position = "{}{}".format(self.Canvas_echiquier.partie.echiquier.lettres_colonnes[colonne], int(self.Canvas_echiquier.partie.echiquier.chiffres_rangees[self.Canvas_echiquier.n_ligne- ligne - 1]))
+        #piece = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
+        #self.messages['text'] = 'Pièce séléctionné : {} à la position {}'.format(piece, self.position_depart_selectionnee)
+        if self.Canvas_echiquier.partie.echiquier.recuperer_piece_a_position(position) is not None:
+            if self.couleur_piece_selectionner == self.Canvas_echiquier.partie.echiquier.couleur_piece_a_position(position):
+                piece = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
+                self.position_depart_selectionnee = position
+                self.piece_selectionner = piece
+                self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
 
             #self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
-            self.position_arriver_selectionnee = position
+        self.position_arriver_selectionnee = position
 
-            if self.partie.echiquier.deplacer(self.position_depart_selectionnee,self.position_arriver_selectionnee) is True:
+        if self.partie.echiquier.deplacement_est_valide(self.position_depart_selectionnee,self.position_arriver_selectionnee) is True:
 
-                self.Canvas_echiquier.dessiner_piece()
-                self.piece_selectionner = None
-                self.messages['text'] = ' '
-                self.Canvas_echiquier.supprimer_selection()
-                self.joueur_actif = self.partie.joueur_suivant()
-                self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
-            else:
-                return None
+            self.piece_mange = self.Canvas_echiquier.partie.echiquier.recuperer_piece_a_position(self.position_arriver_selectionnee)
 
-    def selectionner_arriver(self, event):
-        ligne = event.y // self.Canvas_echiquier.n_pixels_par_case
-        colonne = event.x // self.Canvas_echiquier.n_pixels_par_case
-        position = "{}{}".format(self.Canvas_echiquier.lettres_colonnes[colonne], int(self.Canvas_echiquier.chiffres_rangees[self.Canvas_echiquier.n_ligne- ligne - 1]))
-        return position
+            if self.piece_mange is not None:
+                piece_manger_str = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
+                self.ajouter_piece_manger(piece_manger_str)
+
+            self.Canvas_echiquier.liste_mouvement_effectuer += [[self.piece_selectionner,self.position_depart_selectionnee,self.position_arriver_selectionnee, self.piece_mange]]
+
+            print(self.Canvas_echiquier.liste_mouvement_effectuer)
+
+            self.partie.echiquier.deplacer(self.position_depart_selectionnee,self.position_arriver_selectionnee)
+
+            self.Canvas_echiquier.dessiner_piece()
+            self.piece_selectionner = None
+            self.messages['text'] = ' '
+            self.Canvas_echiquier.supprimer_selection()
+            self.joueur_actif = self.partie.joueur_suivant()
+            self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
+        else:
+            return None
+
+    def ajouter_piece_manger(self, piece_mange_str):
+        if self.piece_mange.couleur == "blanc":
+            self.Canvas_echiquier.piece_blanc_perdu  += str(piece_mange_str)
+            self.messages_piece_blanc['text'] += self.Canvas_echiquier.piece_blanc_perdu
+
+        elif self.piece_mange.couleur == "noir":
+            self.Canvas_echiquier.piece_noir_perdu += str(piece_mange_str)
+            self.messages_piece_noir['text'] += self.Canvas_echiquier.piece_noir_perdu
 
 if __name__ == '__main__':
     f = fenetre()
