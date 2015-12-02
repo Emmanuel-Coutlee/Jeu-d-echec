@@ -58,15 +58,15 @@ class Canvas_echiquier(Canvas):
         self.delete('selection')
 
 
-    def changer_couleur_theme(self, type, couleur):
-        if type == 1:
-            self.couleur_1 = couleur
-        elif type == 2:
-            self.couleur_2 = couleur
-        self.delete('case')
-        self.dessiner_case()
+   # def changer_couleur_theme(self, type, couleur):
+        #if type == 1:
+            #self.couleur_1 = couleur
+        #elif type == 2:
+            #self.couleur_2 = couleur
+        #self.delete('case')
+        #self.dessiner_case()
 
-        self.dessiner_piece()
+        #self.dessiner_piece()
 
 
 
@@ -107,7 +107,7 @@ class fenetre(Tk,menu_global):
 
         self.partie = Partie()
 
-        self.partie.echiquier.deplacer('a2','a4')
+        self.partie.echiquier.deplacer
 
         self.title("Échiquier")
         self.piece_selectionner = None

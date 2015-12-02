@@ -30,6 +30,8 @@ class Piece:
         self.couleur = couleur
         self.peut_sauter = peut_sauter
 
+
+
     def est_blanc(self):
         """Retourne si oui ou non la pièce est blanche.
 

@@ -3,6 +3,7 @@ from time import strftime, localtime
 from pychecs2.echecs.partie import Partie
 import pickle
 import os
+from random import randrange
 
 
 class menu_global():
@@ -156,19 +157,26 @@ class menu_global():
         self.messages_modifier['text'] = "Changez les couleurs des cases à votre goût "
         self.messages_modifier.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
         self.messages_modifier_2 = Label(self.popup)
-        self.messages_modifier_2['text'] = "couleur des cases blanches "
-        self.messages_modifier_2.grid(column = 0, row = 1, pady= 10, padx = 15)
-        self.messages_modifier_3 = Label(self.popup)
-        self.messages_modifier_3['text'] = "couleur des cases noir "
-        self.messages_modifier_3.grid(column = 1, row = 1, pady= 10, padx = 15)
-        self.couleur_case_blanche = ""
-        self.couleur_case_noir = ""
-        self.liste_couleur = ["red", "green", "bleu", "pink", "yellow"]
-        for couleur in self.liste_couleur:
-            radio_couleur_blanc = Radiobutton(self.popup, text= couleur,variable = self.couleur_case_blanche,value = couleur)
-            radio_couleur_noir = Radiobutton(self.popup, text= couleur,variable = self.couleur_case_noir,value = couleur)
-            radio_couleur_blanc.grid(column = 0,padx= 10, pady= 10)
-            radio_couleur_noir.grid(column = 1,padx= 10, pady= 10)
+        self.messages_modifier_3 = Button(self.popup,text="Autre thême", command =self.changer_theme(True),width = 10)
+        self.messages_modifier_3.grid(column = 1, row = 2, pady= 10)
+
+    def changer_couleur_theme(self, type, couleur):
+        if type == 1:
+            self.couleur_1 = couleur
+
+        self.delete('case')
+        self.dessiner_case()
+
+        self.dessiner_piece()
+
+    def changer_theme (self):
+        if self.changer_couleur_theme is True:
+
+            for couleur in self.changer_couleur_theme:
+
+                liste_couleur =['purple','cyan','maroon','green','red','blue','orange','yellow']
+                c = randrange(8) # => génère un nombre aléatoire de 0 à 7
+                self.changer_couleur_theme = liste_couleur[c]
 
     def sauvegarder_partie(self, nom_fichier,quitter):
 
