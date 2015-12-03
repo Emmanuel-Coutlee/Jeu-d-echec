@@ -177,7 +177,7 @@ class fenetre(Tk,menu_global):
         self.messages.grid( column= 1, row=3)
 
         self.messages_piece = Label(self)
-        self.messages_piece['text'] = "Pièces qui on été manger:"
+        self.messages_piece['text'] = "Pièces qui on été mangées:"
         self.messages_piece.grid(column= 1,row =4)
 
         self.messages_piece_blanc = Label(self)
