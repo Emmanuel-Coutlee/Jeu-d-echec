@@ -20,12 +20,11 @@ class menu_global():
         #################################
         #self.affichage_menu.add_command(label= 'Modifier', command =lambda: self.canvas_echiquier.changer_couleur_theme(2,'green'))
         self.affichage_menu.add_command(label= 'Modifier', command =lambda: self.menu_modifier())
-        self.affichage_menu.add_command(label= 'résolution',command = lambda:self.quit)
 
 
         self.aide_menu = Menu(tearoff= 0)
-        self.aide_menu.add_command(label= 'Règle de jeu',command = lambda:self.fenetre_popup('Règle du jeu'))
-        self.aide_menu.add_command(label= 'À propos',command = lambda:self.quit)
+        self.aide_menu.add_command(label= 'Règle de jeu',command = lambda:self.menu_regle_du_jeu())
+        self.aide_menu.add_command(label= 'Aide',command = lambda:self.menu_fonction())
 
         self.menu_bar.add_cascade(label= 'Partie', menu= self.partie_menu)
         self.menu_bar.add_cascade(label= 'Affichage', menu= self.affichage_menu)
@@ -126,6 +125,8 @@ class menu_global():
 
 
     def nouvelle_partie(self, sauvegarder):
+
+###########todo faire marcher cette cochonerie
         if sauvegarder is True:
             self.menu_enregistrer(False)
 
@@ -139,6 +140,7 @@ class menu_global():
         self.messages_piece_noir['text'] = "Pièce noir:"
         self.deselectionner_piece()
         self.Canvas_echiquier.liste_mouvement_effectuer = []
+        self.listbox_mouvement.delete(0,END)
         try:
             self.popup_nouvelle.destroy()
         except:
@@ -273,3 +275,30 @@ class menu_global():
             self.bouton_ok.grid(pady= 10)
 
 
+    def menu_fonction(self):
+        self.popup_fonction = Toplevel()
+        self.popup_fonction.title("Fonctionalité du programe")
+        self.messages_fonction = Label(self.popup_fonction)
+        self.messages_fonction['text'] = "Voici les règle du jeu d'échec pour cette version du programme"
+        self.messages_fonction.grid()
+        self.fonction_programe = Label(self.popup_fonction)
+
+        #todo remplir ce texte
+        self.texte_fonction_programe = ""
+
+        self.fonction_programe['text'] = self.texte_fonction_programe
+        self.fonction_programe.grid()
+
+    def menu_regle_du_jeu(self):
+        self.popup_regle = Toplevel()
+        self.popup_regle.title("Règle du jeu")
+        self.messages_regle = Label(self.popup_regle)
+        self.messages_regle['text'] = "Voici les règle du jeu d'échec pour cette version du programme"
+        self.messages_regle.grid()
+        self.regle_du_jeu = Label(self.popup_regle)
+
+        #todo remplir ce texte
+        self.texte_regle_du_jeu = ""
+
+        self.regle_du_jeu['text'] = self.texte_regle_du_jeu
+        self.regle_du_jeu.grid()

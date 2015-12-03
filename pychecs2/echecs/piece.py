@@ -77,6 +77,8 @@ class Piece:
         """
         # On lance une exception (on y reviendra) indiquant que ce code n'a pas été implémenté. Ne touchez pas
         # à cette méthode : réimplémentez-la dans les classes filles!
+        if position_source==position_cible:
+            return False
         raise NotImplementedError
 
     def peut_faire_une_prise_vers(self, position_source, position_cible):

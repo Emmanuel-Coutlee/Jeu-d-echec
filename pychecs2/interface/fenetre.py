@@ -14,6 +14,7 @@ class Canvas_echiquier(Canvas):
         self.couleur_1 = 'white'
         self.couleur_2 = 'gray'
         self.partie = la_partie
+        self.case_selection = False
 
         self.piece_blanc_perdu = ""
         self.piece_noir_perdu = ""
@@ -47,7 +48,10 @@ class Canvas_echiquier(Canvas):
                                       x_coin_inferieur_droit, y_coin_inferieur_droit, fill = couleur, tag = 'case')
 
     def changer_couleur_position(self, colonne, ligne):
-        self.delete('selection')
+        self.supprimer_selection()
+        self.case_selection = True
+        self.coordonner_colonne = colonne
+        self.coordonner_ligne = ligne
         x_coin_superieur_gauche = colonne*self.n_pixels_par_case
         y_coin_superieur_gauche = ligne*self.n_pixels_par_case
         x_coin_inferieur_droit = colonne*self.n_pixels_par_case + self.n_pixels_par_case
@@ -60,6 +64,7 @@ class Canvas_echiquier(Canvas):
         self.dessiner_piece()
 
     def supprimer_selection(self):
+        self.case_selection = False
         self.delete('selection')
 
 
@@ -89,34 +94,58 @@ class Canvas_echiquier(Canvas):
     def redimensionner(self, event):
         # Nous recevons dans le "event" la nouvelle dimension dans les attributs width et height. On veut un damier
         # carré, alors on ne conserve que la plus petite de ces deux valeurs.
-            nouvelle_taille = min(event.width, event.height)
+        nouvelle_taille = min(event.width, event.height)
 
         # Calcul de la nouvelle dimension des cases.
-            self.n_pixels_par_case = nouvelle_taille // self.n_ligne
+        self.n_pixels_par_case = nouvelle_taille // self.n_ligne
 
         # On supprime les anciennes cases et on ajoute les nouvelles.
-            self.delete('case')
-            self.dessiner_case()
+        self.delete('case')
+        self.dessiner_case()
 
         # On supprime les anciennes pièces et on ajoute les nouvelles.
-            self.delete('piece')
-            self.dessiner_piece()
+        self.delete('piece')
+        self.dessiner_piece()
 
-        #if position_selectionner:
+        if self.case_selection:
+            self.changer_couleur_position(self.coordonner_colonne,self.coordonner_ligne)
+
+    def creation_frame_rangee(self):
+
+
+        for rangee in self.chiffres_rangees_inverse:
+            coordonnee_y = (self.n_ligne - 1) * self.n_pixels_par_case + self.n_pixels_par_case //100
+
+            coordonnee_x = 5
+
+            self.create_text(coordonnee_x, coordonnee_y, text=rangee,
+                             font=('Deja Vu', self.n_pixels_par_case//2), tags='chiffre_ranger')
+
+
+
+
+    def creation_frame_colonne(self):
+        self.affiche_liste_colonne = Frame(self, bg = "red", pady= 5)
+        place_colonne = 0
+        for element in self.partie.echiquier.lettres_colonnes:
+            self.lettre_colonne= Label(self.affiche_liste_colonne,width= self.n_pixels_par_case//8)
+            self.lettre_colonne['text'] = element
+
+            self.lettre_colonne.grid(row= 0, column=place_colonne,sticky= N)
+            place_colonne +=1
+
 
 
 class fenetre(Tk,menu_global):
 
     def __init__(self):
         super().__init__()
-        #self.background( colour = 'red')
 
         self.partie = Partie()
 
-        self.partie.echiquier.deplacer
-
-        self.title("Échiquier")
+        self.title("Jeu d'échec")
         self.piece_selectionner = None
+        self.nombre_déplacement = 1
 
         self.grid_columnconfigure(1, weight = 1)
         self.grid_rowconfigure(0, weight = 1)
@@ -134,11 +163,11 @@ class fenetre(Tk,menu_global):
         self.Canvas_echiquier.grid(sticky=NSEW,column = 1 ,row=0)
 
 ###########################################
-        self.creation_frame_rangee()
-        self.affiche_liste_rangee.grid(column= 0,row =0 )
+        self.Canvas_echiquier.creation_frame_rangee()
+        #self.Canvas_echiquier.affiche_liste_rangee.grid(column= 0,row =0 )
 
-        self.creation_frame_colonne()
-        self.affiche_liste_colonne.grid(column= 1,row =1 )
+        #self.Canvas_echiquier.creation_frame_colonne()
+        #self.Canvas_echiquier.affiche_liste_colonne.grid(column= 1,row =1 )
 
         self.messages_joueur = Label(self)
         self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
@@ -170,25 +199,6 @@ class fenetre(Tk,menu_global):
             self.annoncer_partie_gagner()
         self.premier_menu()
 
-    def creation_frame_rangee(self):
-        self.affiche_liste_rangee = Frame(self, bg = "red")
-
-        for element in self.Canvas_echiquier.chiffres_rangees_inverse:
-            self.chiffre_rangee= Label(self.affiche_liste_rangee,height= (self.Canvas_echiquier.n_pixels_par_case//20))
-            self.chiffre_rangee['text'] = element
-
-            self.chiffre_rangee.grid(sticky= N)
-
-
-    def creation_frame_colonne(self):
-        self.affiche_liste_colonne = Frame(self, bg = "red", pady= 5)
-        place_colonne = 0
-        for element in self.partie.echiquier.lettres_colonnes:
-            self.lettre_colonne= Label(self.affiche_liste_colonne,width= self.Canvas_echiquier.n_pixels_par_case//8)
-            self.lettre_colonne['text'] = element
-
-            self.lettre_colonne.grid(row= 0, column=place_colonne,sticky= N)
-            place_colonne +=1
 
 
     def creation_frame_droite(self):
@@ -216,16 +226,22 @@ class fenetre(Tk,menu_global):
 
         self.messages_mouvement = Label(self.frame)
         self.messages_mouvement['text'] = "Mouvement joué:"
-        self.messages_mouvement.grid(column= 0,row=3 , columnspan= 2,padx= 100, pady= 15, sticky= N)
+        self.messages_mouvement.grid(column= 0,row=3 , columnspan= 2,padx= 150, pady= 15, sticky= N)
 
         self.creation_frame_mouvement()
         self.frame_mouvement.grid(column= 0,row=4, columnspan= 2,sticky= NSEW)
 
-        self.bouton_annuler_dernier_coup = Button(self.frame, text="Annuler le\ndernier coup", command = None,width = 15)
+        self.bouton_annuler_dernier_coup = Button(self.frame, text="Annuler le\ndernier coup", command = self.annuler_mouvement,width = 15)
         self.bouton_annuler_dernier_coup.grid(column = 0,columnspan = 2, row = 5, pady= 15)
 
     def creation_frame_mouvement(self):
         self.frame_mouvement = Frame(self.frame, bg="blue",width = 200,height= 450)
+
+        self.scrollbar = Scrollbar(self.frame_mouvement, orient=VERTICAL)
+        self.listbox_mouvement = Listbox(self.frame_mouvement, yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.listbox_mouvement.yview)
+        self.scrollbar.pack(side=RIGHT, fill=Y)
+        self.listbox_mouvement.pack(side=LEFT, fill=BOTH, expand=1)
 
 
 
@@ -265,7 +281,7 @@ class fenetre(Tk,menu_global):
                     return None
                 self.piece_selectionner = piece
                 self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
-                return position
+                self.verifier_coup_valide(position)
             except KeyError:
                 self.messages['foreground'] = 'red'
                 self.messages['text'] = 'erreur aucune piece ici'
@@ -273,6 +289,16 @@ class fenetre(Tk,menu_global):
 
         else:
             self.selectionner_arriver(ligne, colonne)
+
+    def verifier_coup_valide(self, position_depart ):
+        for ligne in self.Canvas_echiquier.partie.echiquier.chiffres_rangees:
+            for colonne in self.Canvas_echiquier.partie.echiquier.lettres_colonnes:
+                position_arriver = "{}{}".format(colonne,ligne)
+                if self.Canvas_echiquier.partie.echiquier.deplacement_est_valide(position_depart,position_arriver):
+                    print("deplacement valide de ", position_depart, " à ", position_arriver)
+##############todo arriver à changer couleur
+                    #self.Canvas_echiquier.changer_couleur_position(colonne,ligne)
+                    pass
 
     def selectionner_arriver(self, ligne, colonne):
         position = "{}{}".format(self.Canvas_echiquier.partie.echiquier.lettres_colonnes[colonne], int(self.Canvas_echiquier.partie.echiquier.chiffres_rangees[self.Canvas_echiquier.n_ligne- ligne - 1]))
@@ -296,20 +322,69 @@ class fenetre(Tk,menu_global):
                 piece_manger_str = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
                 self.ajouter_piece_manger(piece_manger_str)
 
-            self.Canvas_echiquier.liste_mouvement_effectuer += [[self.piece_selectionner,self.position_depart_selectionnee,self.position_arriver_selectionnee, self.piece_mange]]
+            self.dernier_mouvement_effectuer = [self.piece_selectionner,self.position_depart_selectionnee,self.position_arriver_selectionnee, self.piece_mange]
+
+            self.numero_deplacement, self.message_dernier_mouvement=  self.message_mouvement(self.dernier_mouvement_effectuer)
+
+            self.nombre_déplacement +=1
+
+            self.listbox_mouvement.insert(END, self.numero_deplacement)
+            self.listbox_mouvement.insert(END, self.message_dernier_mouvement)
+            self.listbox_mouvement.see(END)
+
+            self.Canvas_echiquier.liste_mouvement_effectuer += [self.dernier_mouvement_effectuer]
 
             print(self.Canvas_echiquier.liste_mouvement_effectuer)
 
             self.partie.echiquier.deplacer(self.position_depart_selectionnee,self.position_arriver_selectionnee)
 
-            self.Canvas_echiquier.dessiner_piece()
-            self.piece_selectionner = None
-            self.messages['text'] = ' '
-            self.Canvas_echiquier.supprimer_selection()
-            self.joueur_actif = self.partie.joueur_suivant()
-            self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
+            self.changer_de_tour()
         else:
             return None
+
+    def changer_de_tour(self):
+        self.Canvas_echiquier.dessiner_piece()
+        self.piece_selectionner = None
+        self.messages['text'] = ' '
+        self.Canvas_echiquier.supprimer_selection()
+        self.joueur_actif = self.partie.joueur_suivant()
+        self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
+
+
+    def annuler_mouvement(self):
+        try:
+            mouvement = self.Canvas_echiquier.liste_mouvement_effectuer[-1]
+            if mouvement[3] is not None:
+                self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[2]]= mouvement[3]
+                self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[1]]= mouvement[0]
+                self.changer_de_tour()
+                del self.Canvas_echiquier.liste_mouvement_effectuer[-1]
+                self.listbox_mouvement.delete(END)
+                self.listbox_mouvement.delete(END)
+                print(self.Canvas_echiquier.liste_mouvement_effectuer)
+            else:
+                self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[1]]= mouvement[0]
+                del self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[2]]
+                self.changer_de_tour()
+                del self.Canvas_echiquier.liste_mouvement_effectuer[-1]
+                self.listbox_mouvement.delete(END)
+                self.listbox_mouvement.delete(END)
+                print(self.Canvas_echiquier.liste_mouvement_effectuer)
+
+        except IndexError:
+            self.messages['foreground'] = 'red'
+            self.messages['text'] = "Il n'y a aucun coup de jouer pour le moment."
+
+
+    def message_mouvement(self,mouvement):
+
+        if mouvement[3] is not None:
+            numero_deplacement = "Déplacement {}:".format(self.nombre_déplacement)
+            text_mouvement= "Le {} se déplace de la case {} à {} et mange {}".format(mouvement[0],mouvement[1],mouvement[2],mouvement[3])
+        else:
+            numero_deplacement = "Déplacement {}:".format(self.nombre_déplacement)
+            text_mouvement= "Le {} se déplace de la case {} à {}".format(mouvement[0],mouvement[1],mouvement[2])
+        return numero_deplacement, text_mouvement
 
     def ajouter_piece_manger(self, piece_mange_str):
         if self.piece_mange.couleur == "blanc":
