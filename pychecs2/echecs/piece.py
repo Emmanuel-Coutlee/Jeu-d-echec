@@ -298,15 +298,16 @@ class Roi(Piece):
         rangee_cible = int(position_cible [1])
         colonne_source = ord(position_source [0])
         colonne_cible = ord(position_cible[0])
-
-        if rangee_cible == (rangee_source-1):
-            return True
-        if rangee_cible == (rangee_source+1):
-            return True
-        if colonne_cible == (colonne_source-1):
-            return True
-        if colonne_cible == (colonne_source+1):
-            return True
+        if colonne_cible == colonne_source:
+            if rangee_cible == (rangee_source-1):
+                return True
+            if rangee_cible == (rangee_source+1):
+                return True
+        if rangee_cible == rangee_source:
+            if colonne_cible == (colonne_source-1):
+                return True
+            if colonne_cible == (colonne_source+1):
+                return True
 
         if abs(colonne_cible - colonne_source) == 1:
             if abs(rangee_cible - rangee_source) == 1:

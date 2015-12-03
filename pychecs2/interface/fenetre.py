@@ -251,7 +251,7 @@ class fenetre(Tk,menu_global):
         self.messages_gagner['text'] = "Félicitation! \nLe joueur {} à gagné la partie!\n\n Voulez-vous jouer une nouvelle partie?".format(self.partie.joueur_actif)
         self.messages_gagner.grid(columnspan = 2)
 
-        self.bouton_nouvelle = Button(self.popup_gagner,text="Oui", command =lambda:self.nouvelle_partie(False),width = 10)
+        self.bouton_nouvelle = Button(self.popup_gagner,text="Oui", command =lambda:self.nouvelle_partie(),width = 10)
         self.bouton_quitter = Button(self.popup_gagner, text="Non, quitter", command = self.quit,width = 10)
         self.bouton_nouvelle.grid(column = 0, row = 1, pady= 10)
         self.bouton_quitter.grid(column = 1, row = 1, pady= 10)
@@ -331,8 +331,6 @@ class fenetre(Tk,menu_global):
 
             self.Canvas_echiquier.liste_mouvement_effectuer += [self.dernier_mouvement_effectuer]
 
-            print(self.Canvas_echiquier.liste_mouvement_effectuer)
-
             self.partie.echiquier.deplacer(self.position_depart_selectionnee,self.position_arriver_selectionnee)
 
             self.Canvas_echiquier.dessiner_piece()
@@ -363,7 +361,7 @@ class fenetre(Tk,menu_global):
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
-                print(self.Canvas_echiquier.liste_mouvement_effectuer)
+                self.Canvas_echiquier.dessiner_piece()
             else:
                 self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[1]]= mouvement[0]
                 del self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[2]]
@@ -371,7 +369,7 @@ class fenetre(Tk,menu_global):
                 del self.Canvas_echiquier.liste_mouvement_effectuer[-1]
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
-                print(self.Canvas_echiquier.liste_mouvement_effectuer)
+                self.Canvas_echiquier.dessiner_piece()
 
         except IndexError:
             self.messages['foreground'] = 'red'
@@ -404,11 +402,11 @@ class fenetre(Tk,menu_global):
     def ajouter_piece_manger(self, piece_mange_str):
         if self.piece_mange.couleur == "blanc":
             self.Canvas_echiquier.piece_blanc_perdu  += str(piece_mange_str)
-            self.messages_piece_blanc['text'] += self.Canvas_echiquier.piece_blanc_perdu
+            self.messages_piece_blanc['text'] = "Pièce blanc:" +self.Canvas_echiquier.piece_blanc_perdu
 
         elif self.piece_mange.couleur == "noir":
             self.Canvas_echiquier.piece_noir_perdu += str(piece_mange_str)
-            self.messages_piece_noir['text'] += self.Canvas_echiquier.piece_noir_perdu
+            self.messages_piece_noir['text'] = "Pièce blanc:"+self.Canvas_echiquier.piece_noir_perdu
 
 if __name__ == '__main__':
     f = fenetre()
