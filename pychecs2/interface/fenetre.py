@@ -158,7 +158,7 @@ class fenetre(Tk,menu_global):
         #self.affiche_liste_rangee['text'] = "     a            b             c             d             e             f             g             h"
         #self.affiche_liste_rangee.grid(column= 1,row =1 )
 
-        self.Canvas_echiquier = Canvas_echiquier(self, 60, self.partie)
+        self.Canvas_echiquier = Canvas_echiquier(self, 80, self.partie)
 
         self.Canvas_echiquier.grid(sticky=NSEW,column = 1 ,row=0)
 
@@ -195,15 +195,13 @@ class fenetre(Tk,menu_global):
         self.Canvas_echiquier.bind('<Button-1>', self.selectionner_piece)
         self.Canvas_echiquier.bind('<Button-3>', self.deselectionner_piece)
 
-        if self.Canvas_echiquier.partie.partie_terminee() == True:
-            self.annoncer_partie_gagner()
         self.premier_menu()
 
 
 
     def creation_frame_droite(self):
 
-        self.frame = Frame(self, bg="red")
+        self.frame = Frame(self)
 
 
         self.messages_temps_jeu = Label(self.frame)
@@ -226,7 +224,7 @@ class fenetre(Tk,menu_global):
 
         self.messages_mouvement = Label(self.frame)
         self.messages_mouvement['text'] = "Mouvement joué:"
-        self.messages_mouvement.grid(column= 0,row=3 , columnspan= 2,padx= 150, pady= 15, sticky= N)
+        self.messages_mouvement.grid(column= 0,row=3 , columnspan= 2,padx= 100, pady= 15, sticky= N)
 
         self.creation_frame_mouvement()
         self.frame_mouvement.grid(column= 0,row=4, columnspan= 2,sticky= NSEW)
@@ -238,7 +236,7 @@ class fenetre(Tk,menu_global):
         self.frame_mouvement = Frame(self.frame, bg="blue",width = 200,height= 450)
 
         self.scrollbar = Scrollbar(self.frame_mouvement, orient=VERTICAL)
-        self.listbox_mouvement = Listbox(self.frame_mouvement, yscrollcommand=self.scrollbar.set)
+        self.listbox_mouvement = Listbox(self.frame_mouvement, yscrollcommand=self.scrollbar.set,activestyle = 'none', height = 25)
         self.scrollbar.config(command=self.listbox_mouvement.yview)
         self.scrollbar.pack(side=RIGHT, fill=Y)
         self.listbox_mouvement.pack(side=LEFT, fill=BOTH, expand=1)
@@ -246,19 +244,20 @@ class fenetre(Tk,menu_global):
 
 
     def annoncer_partie_gagner(self):
-        self.gagner = Toplevel()
-        self.gagner.title("Partie Terminer")
-        self.messages_gagner = Label(self.gagner)
-        self.messages_gagner['text'] = "Félicitation! le {} à gagné la partie!\n Voulez-vous jouer une nouvelle partie?".format(self.partie.joueur_actif)
+        #todo modifier le label pour le rendre beau
+        self.popup_gagner = Toplevel()
+        self.popup_gagner.title("Partie Terminer")
+        self.messages_gagner = Label(self.popup_gagner)
+        self.messages_gagner['text'] = "Félicitation! \nLe joueur {} à gagné la partie!\n\n Voulez-vous jouer une nouvelle partie?".format(self.partie.joueur_actif)
         self.messages_gagner.grid(columnspan = 2)
 
-        self.bouton_nouvelle = Button(self.popup,text="Oui", command =lambda:self.nouvelle_partie(False),width = 10)
-        self.bouton_quitter = Button(self.popup, text="Non, quitter", command = self.quit,width = 10)
+        self.bouton_nouvelle = Button(self.popup_gagner,text="Oui", command =lambda:self.nouvelle_partie(False),width = 10)
+        self.bouton_quitter = Button(self.popup_gagner, text="Non, quitter", command = self.quit,width = 10)
         self.bouton_nouvelle.grid(column = 0, row = 1, pady= 10)
         self.bouton_quitter.grid(column = 1, row = 1, pady= 10)
 
 
-    def deselectionner_piece(self):
+    def deselectionner_piece(self, event):
         self.piece_selectionner = None
         self.Canvas_echiquier.supprimer_selection()
         self.messages['text'] = ' '
@@ -324,12 +323,10 @@ class fenetre(Tk,menu_global):
 
             self.dernier_mouvement_effectuer = [self.piece_selectionner,self.position_depart_selectionnee,self.position_arriver_selectionnee, self.piece_mange]
 
-            self.numero_deplacement, self.message_dernier_mouvement=  self.message_mouvement(self.dernier_mouvement_effectuer)
+            self.message_mouvement(self.dernier_mouvement_effectuer)
 
             self.nombre_déplacement +=1
 
-            self.listbox_mouvement.insert(END, self.numero_deplacement)
-            self.listbox_mouvement.insert(END, self.message_dernier_mouvement)
             self.listbox_mouvement.see(END)
 
             self.Canvas_echiquier.liste_mouvement_effectuer += [self.dernier_mouvement_effectuer]
@@ -338,12 +335,16 @@ class fenetre(Tk,menu_global):
 
             self.partie.echiquier.deplacer(self.position_depart_selectionnee,self.position_arriver_selectionnee)
 
+            self.Canvas_echiquier.dessiner_piece()
+
+            if self.Canvas_echiquier.partie.partie_terminee() == True:
+                self.annoncer_partie_gagner()
+
             self.changer_de_tour()
         else:
             return None
 
     def changer_de_tour(self):
-        self.Canvas_echiquier.dessiner_piece()
         self.piece_selectionner = None
         self.messages['text'] = ' '
         self.Canvas_echiquier.supprimer_selection()
@@ -361,6 +362,7 @@ class fenetre(Tk,menu_global):
                 del self.Canvas_echiquier.liste_mouvement_effectuer[-1]
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
+                self.listbox_mouvement.delete(END)
                 print(self.Canvas_echiquier.liste_mouvement_effectuer)
             else:
                 self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[1]]= mouvement[0]
@@ -373,18 +375,31 @@ class fenetre(Tk,menu_global):
 
         except IndexError:
             self.messages['foreground'] = 'red'
-            self.messages['text'] = "Il n'y a aucun coup de jouer pour le moment."
+            self.messages['text'] = "Il n'y a aucun coup de joué pour le moment."
 
 
     def message_mouvement(self,mouvement):
+        couleur_piece_depart = mouvement[0].couleur
 
         if mouvement[3] is not None:
-            numero_deplacement = "Déplacement {}:".format(self.nombre_déplacement)
-            text_mouvement= "Le {} se déplace de la case {} à {} et mange {}".format(mouvement[0],mouvement[1],mouvement[2],mouvement[3])
+            piece_arriver = mouvement[3].couleur
+            numero_deplacement = "Déplacement {}: Joueur {}".format(self.nombre_déplacement, self.Canvas_echiquier.partie.joueur_actif)
+            text_mouvement= "Le {} {} se déplace de la case {} à {}".format(mouvement[0],couleur_piece_depart,mouvement[1],mouvement[2])
+            text_manger ="Puis, mange le {} {}".format(mouvement[3], piece_arriver)
+            self.listbox_mouvement.insert(END,numero_deplacement)
+            self.listbox_mouvement.itemconfig(END,fg= "blue")
+            self.listbox_mouvement.insert(END, text_mouvement)
+            self.listbox_mouvement.insert(END, text_manger)
+            self.listbox_mouvement.selection_clear(0, END)
+
         else:
-            numero_deplacement = "Déplacement {}:".format(self.nombre_déplacement)
-            text_mouvement= "Le {} se déplace de la case {} à {}".format(mouvement[0],mouvement[1],mouvement[2])
-        return numero_deplacement, text_mouvement
+
+            numero_deplacement = "Déplacement {}: Joueur {}".format(self.nombre_déplacement,self.Canvas_echiquier.partie.joueur_actif)
+            text_mouvement= "Le {} {} se déplace de la case {} à {}".format(mouvement[0],couleur_piece_depart,mouvement[1],mouvement[2])
+            self.listbox_mouvement.insert(END,numero_deplacement)
+            self.listbox_mouvement.itemconfig(END,fg= "blue")
+            self.listbox_mouvement.insert(END, text_mouvement)
+            self.listbox_mouvement.selection_clear(0, END)
 
     def ajouter_piece_manger(self, piece_mange_str):
         if self.piece_mange.couleur == "blanc":

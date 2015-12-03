@@ -138,11 +138,19 @@ class menu_global():
 
         self.messages_piece_blanc['text'] = "Pièce blanc:"
         self.messages_piece_noir['text'] = "Pièce noir:"
-        self.deselectionner_piece()
+        self.deselectionner_piece(None)
         self.Canvas_echiquier.liste_mouvement_effectuer = []
         self.listbox_mouvement.delete(0,END)
         try:
+            self.popup_gagner.destroy()
+        #la fenetre n'existe pas donc on ne ferme rien
+        except:
+            pass
+
+
+        try:
             self.popup_nouvelle.destroy()
+        #la fenetre n'existe pas donc on ne ferme rien
         except:
             pass
         #lancer la nouvelle partie
@@ -274,7 +282,6 @@ class menu_global():
             self.bouton_ok = Button(self.confirme,text="ok",width=10, command =self.quit)
             self.bouton_ok.grid(pady= 10)
 
-
     def menu_fonction(self):
         self.popup_fonction = Toplevel()
         self.popup_fonction.title("Fonctionalité du programe")
@@ -284,21 +291,28 @@ class menu_global():
         self.fonction_programe = Label(self.popup_fonction)
 
         #todo remplir ce texte
-        self.texte_fonction_programe = ""
+        self.texte_fonction_programe = "entrez les fonction ici et crédit"
 
         self.fonction_programe['text'] = self.texte_fonction_programe
         self.fonction_programe.grid()
+
+        self.bouton_ok = Button(self.popup_fonction,text="ok",width=10, command =self.popup_fonction.destroy)
+        self.bouton_ok.grid(pady= 10)
 
     def menu_regle_du_jeu(self):
         self.popup_regle = Toplevel()
         self.popup_regle.title("Règle du jeu")
         self.messages_regle = Label(self.popup_regle)
-        self.messages_regle['text'] = "Voici les règle du jeu d'échec pour cette version du programme"
+        self.messages_regle['text'] = "Voici les les fonction pour cette version du programme"
         self.messages_regle.grid()
         self.regle_du_jeu = Label(self.popup_regle)
 
+
         #todo remplir ce texte
-        self.texte_regle_du_jeu = ""
+        self.texte_regle_du_jeu = "entrez les regle ici"
 
         self.regle_du_jeu['text'] = self.texte_regle_du_jeu
         self.regle_du_jeu.grid()
+
+        self.bouton_ok = Button(self.popup_regle,text="ok",width=10, command =self.popup_regle.destroy)
+        self.bouton_ok.grid(pady= 10)
