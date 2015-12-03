@@ -134,8 +134,11 @@ class menu_global():
         self.Canvas_echiquier.dessiner_piece()
         self.Canvas_echiquier.partie.joueur_actif = "blanc"
         self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
+
         self.messages_piece_blanc['text'] = "Pièce blanc:"
         self.messages_piece_noir['text'] = "Pièce noir:"
+        self.deselectionner_piece()
+        self.Canvas_echiquier.liste_mouvement_effectuer = []
         try:
             self.popup_nouvelle.destroy()
         except:
@@ -199,7 +202,9 @@ class menu_global():
 
         dictionaire = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces
 
-        pickle.dump(dictionaire, open(nom_fichier+".p",'wb'))
+        joueur_actif = self.Canvas_echiquier.partie.joueur_actif
+
+        pickle.dump((joueur_actif,dictionaire), open(nom_fichier+".p",'wb'))
 
         #ecriture_csv = csv.writer(fichier_ecriture)
 
@@ -231,9 +236,11 @@ class menu_global():
     def ecraser_partie(self,nom_fichier, quitter):
         dictionaire = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces
 
-        pickle.dump(dictionaire, open(nom_fichier+".p",'wb'))
+        joueur_actif = self.Canvas_echiquier.partie.joueur_actif
+
+        pickle.dump((joueur_actif,dictionaire), open(nom_fichier+".p",'wb'))
         self.popup_ecraser.destroy()
-        self.popup.destroy()
+        self.popup_ecraser.destroy()
         self.confirmation(quitter)
 
     def charger_partie(self, nom_partie):
@@ -241,11 +248,12 @@ class menu_global():
         try:
             #fichier_lecture = open(nom_partie,'r',encoding="utf-8")
 
-            self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces = pickle.load(open(nom_partie+".p","rb"))
+            (self.Canvas_echiquier.partie.joueur_actif,self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces) = pickle.load(open(nom_partie+".p","rb"))
 
             #for cle, valeur in csv.reader(fichier_lecture):
                 #self.dictionnaire_pieces[cle]= eval(valeur)
             #fichier_lecture.close()
+            self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
             self.Canvas_echiquier.dessiner_piece()
             self.popup.destroy()
         except FileNotFoundError:

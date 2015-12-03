@@ -20,7 +20,7 @@ class Canvas_echiquier(Canvas):
 
         self.liste_mouvement_effectuer = []
 
-        #self.chiffres_rangees = ['1', '2', '3', '4', '5', '6', '7', '8']
+        self.chiffres_rangees_inverse= ['8', '7', '6', '5', '4', '3', '2', '1']
         #self.lettres_colonnes = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
 
@@ -101,6 +101,7 @@ class Canvas_echiquier(Canvas):
         # On supprime les anciennes pièces et on ajoute les nouvelles.
             self.delete('piece')
             self.dessiner_piece()
+
         #if position_selectionner:
 
 
@@ -117,61 +118,116 @@ class fenetre(Tk,menu_global):
         self.title("Échiquier")
         self.piece_selectionner = None
 
-        self.grid_columnconfigure(0, weight = 1)
+        self.grid_columnconfigure(1, weight = 1)
         self.grid_rowconfigure(0, weight = 1)
 
-        self.affiche_liste_rangee = Label(self)
-        self.affiche_liste_rangee['text'] = "8\n\n\n7\n\n\n6\n\n\n5\n\n\n4\n\n\n3\n\n\n2\n\n\n1"
-        self.affiche_liste_rangee.grid(column= 0,row =0 )
+        #self.affiche_liste_rangee = Label(self)
+        #self.affiche_liste_rangee['text'] = "8\n\n\n7\n\n\n6\n\n\n5\n\n\n4\n\n\n3\n\n\n2\n\n\n1"
+        #self.affiche_liste_rangee.grid(column= 0,row =0 )
 
-        self.affiche_liste_rangee = Label(self)
-        self.affiche_liste_rangee['text'] = "     a            b             c             d             e             f             g             h"
-        self.affiche_liste_rangee.grid(column= 1,row =4 )
+        #self.affiche_liste_rangee = Label(self)
+        #self.affiche_liste_rangee['text'] = "     a            b             c             d             e             f             g             h"
+        #self.affiche_liste_rangee.grid(column= 1,row =1 )
 
         self.Canvas_echiquier = Canvas_echiquier(self, 60, self.partie)
-        self.Canvas_echiquier.grid(sticky=NSEW,column = 1 ,row=0,columnspan = 3, rowspan= 4)
+
+        self.Canvas_echiquier.grid(sticky=NSEW,column = 1 ,row=0)
+
+###########################################
+        self.creation_frame_rangee()
+        self.affiche_liste_rangee.grid(column= 0,row =0 )
+
+        self.creation_frame_colonne()
+        self.affiche_liste_colonne.grid(column= 1,row =1 )
 
         self.messages_joueur = Label(self)
         self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
-        self.messages_joueur.grid(columnspan = 3, row = 5)
+        self.messages_joueur.grid(column = 1, row = 2)
 
         self.messages= Label(self)
-        self.messages.grid( columnspan= 3, row=6)
+        self.messages.grid( column= 1, row=3)
 
         self.messages_piece = Label(self)
         self.messages_piece['text'] = "Pièces qui on été manger:"
-        self.messages_piece.grid(column= 1,row =7 )
+        self.messages_piece.grid(column= 1,row =4)
 
         self.messages_piece_blanc = Label(self)
         self.messages_piece_blanc['text'] = "Pièce blanc:"
-        self.messages_piece_blanc.grid(column= 1, row=8)
+        self.messages_piece_blanc.grid(column= 1, row=5)
         self.messages_piece_noir = Label(self)
         self.messages_piece_noir['text'] = "Pièce noir:"
-        self.messages_piece_noir.grid(column= 1,row =9)
+        self.messages_piece_noir.grid(column= 1,row =6)
 
 
-        self.frame_droite = Frame(self)
-        self.frame_droite.grid(column = 4)
+        self.creation_frame_droite()
+        self.frame.grid(column = 2, row=0, rowspan=7, sticky = NSEW)
 
 
         self.Canvas_echiquier.bind('<Button-1>', self.selectionner_piece)
         self.Canvas_echiquier.bind('<Button-3>', self.deselectionner_piece)
+
         if self.Canvas_echiquier.partie.partie_terminee() == True:
             self.annoncer_partie_gagner()
         self.premier_menu()
 
-    def frame_droite(self):
+    def creation_frame_rangee(self):
+        self.affiche_liste_rangee = Frame(self, bg = "red")
 
-        self.messages_temps_jeu = Label(self.frame_droite)
+        for element in self.Canvas_echiquier.chiffres_rangees_inverse:
+            self.chiffre_rangee= Label(self.affiche_liste_rangee,height= (self.Canvas_echiquier.n_pixels_par_case//20))
+            self.chiffre_rangee['text'] = element
+
+            self.chiffre_rangee.grid(sticky= N)
+
+
+    def creation_frame_colonne(self):
+        self.affiche_liste_colonne = Frame(self, bg = "red", pady= 5)
+        place_colonne = 0
+        for element in self.partie.echiquier.lettres_colonnes:
+            self.lettre_colonne= Label(self.affiche_liste_colonne,width= self.Canvas_echiquier.n_pixels_par_case//8)
+            self.lettre_colonne['text'] = element
+
+            self.lettre_colonne.grid(row= 0, column=place_colonne,sticky= N)
+            place_colonne +=1
+
+
+    def creation_frame_droite(self):
+
+        self.frame = Frame(self, bg="red")
+
+
+        self.messages_temps_jeu = Label(self.frame)
         self.messages_temps_jeu['text'] = "Temps de jeu"
-        self.messages_temps_jeu.grid(column= 3,row=0 , sticky = N,padx= 10)
+        self.messages_temps_jeu.grid(column= 0,row=0 , columnspan= 2,padx= 10, pady= 10)
 
-        self.messages_temps_jeu_blanc = Label(self.frame_droite)
+        self.messages_temps_jeu_blanc = Label(self.frame)
         self.messages_temps_jeu_blanc['text'] = "Pièce blanc:"
-        self.messages_temps_jeu_blanc.grid(column= 3, row = 1)
-        self.messages_temps_jeu_noir = Label(self.frame_droite)
+        self.messages_temps_jeu_blanc.grid(column= 0, row = 1)
+        self.messages_temps_jeu_noir = Label(self.frame)
         self.messages_temps_jeu_noir['text'] = "Pièce noir:"
-        self.messages_temps_jeu_noir.grid(column=3, row=2,sticky = N)
+        self.messages_temps_jeu_noir.grid(column=0, row=2)
+
+        self.temps_jeu_blanc = Label(self.frame)
+        self.temps_jeu_blanc['text'] = "temps"
+        self.temps_jeu_blanc.grid(column= 1, row = 1)
+        self.temps_jeu_noir = Label(self.frame)
+        self.temps_jeu_noir['text'] = "temps"
+        self.temps_jeu_noir.grid(column=1, row=2)
+
+        self.messages_mouvement = Label(self.frame)
+        self.messages_mouvement['text'] = "Mouvement joué:"
+        self.messages_mouvement.grid(column= 0,row=3 , columnspan= 2,padx= 100, pady= 15, sticky= N)
+
+        self.creation_frame_mouvement()
+        self.frame_mouvement.grid(column= 0,row=4, columnspan= 2,sticky= NSEW)
+
+        self.bouton_annuler_dernier_coup = Button(self.frame, text="Annuler le\ndernier coup", command = None,width = 15)
+        self.bouton_annuler_dernier_coup.grid(column = 0,columnspan = 2, row = 5, pady= 15)
+
+    def creation_frame_mouvement(self):
+        self.frame_mouvement = Frame(self.frame, bg="blue",width = 200,height= 450)
+
+
 
     def annoncer_partie_gagner(self):
         self.gagner = Toplevel()
@@ -186,7 +242,7 @@ class fenetre(Tk,menu_global):
         self.bouton_quitter.grid(column = 1, row = 1, pady= 10)
 
 
-    def deselectionner_piece(self, event):
+    def deselectionner_piece(self):
         self.piece_selectionner = None
         self.Canvas_echiquier.supprimer_selection()
         self.messages['text'] = ' '
