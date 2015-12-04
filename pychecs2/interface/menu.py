@@ -120,10 +120,6 @@ class menu_global():
 
     def nouvelle_partie(self):
 
-###########todo faire marcher cette cochonerie
-
-
-
         self.Canvas_echiquier.partie.echiquier.initialiser_echiquier_depart()
         self.Canvas_echiquier.dessiner_piece()
         self.Canvas_echiquier.partie.joueur_actif = "blanc"

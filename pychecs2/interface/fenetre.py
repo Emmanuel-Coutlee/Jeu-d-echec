@@ -22,7 +22,7 @@ class Canvas_echiquier(Canvas):
         self.liste_mouvement_effectuer = []
 
         self.chiffres_rangees_inverse= ['8', '7', '6', '5', '4', '3', '2', '1']
-        #self.lettres_colonnes = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+        self.lettres_colonnes = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
 
         super().__init__(parent, width = self.n_ligne*self.n_pixels_par_case,
@@ -30,13 +30,13 @@ class Canvas_echiquier(Canvas):
         self.bind('<Configure>', self.redimensionner)
 
     def dessiner_case(self):
-
+        self.delete("case")
         for i in range(self.n_ligne):
             for j in range(self.n_colonne):
-                x_coin_superieur_gauche = i*self.n_pixels_par_case
-                y_coin_superieur_gauche = j*self.n_pixels_par_case
-                x_coin_inferieur_droit = i*self.n_pixels_par_case + self.n_pixels_par_case
-                y_coin_inferieur_droit = j*self.n_pixels_par_case + self.n_pixels_par_case
+                x_coin_superieur_gauche = j*self.n_pixels_par_case
+                y_coin_superieur_gauche = i*self.n_pixels_par_case
+                x_coin_inferieur_droit = j*self.n_pixels_par_case + self.n_pixels_par_case
+                y_coin_inferieur_droit = i*self.n_pixels_par_case + self.n_pixels_par_case
 
                 if (i+j) % 2 == 0:
                     couleur = self.couleur_1
@@ -44,8 +44,14 @@ class Canvas_echiquier(Canvas):
                 else:
                     couleur = self.couleur_2
 
+                chiffre_rangee = self.chiffres_rangees_inverse[i]
+
+                lettre_colonne= self.lettres_colonnes[j]
+
+                nom_case = 'case{}{}'.format(lettre_colonne,chiffre_rangee)
+
                 self.create_rectangle(x_coin_superieur_gauche, y_coin_superieur_gauche,
-                                      x_coin_inferieur_droit, y_coin_inferieur_droit, fill = couleur, tag = 'case')
+                                      x_coin_inferieur_droit, y_coin_inferieur_droit, fill = couleur, tag = (nom_case,'case'))
 
     def changer_couleur_position(self, colonne, ligne):
         self.supprimer_selection()
@@ -279,8 +285,8 @@ class fenetre(Tk,menu_global):
                     self.messages['text'] = "Vous essayer de jouer une pièce de l'autre joueur TRICHEUR!"
                     return None
                 self.piece_selectionner = piece
-                self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
-                self.verifier_coup_valide(position)
+
+                self.verifier_coup_valide(position, colonne, ligne)
             except KeyError:
                 self.messages['foreground'] = 'red'
                 self.messages['text'] = 'erreur aucune piece ici'
@@ -289,15 +295,22 @@ class fenetre(Tk,menu_global):
         else:
             self.selectionner_arriver(ligne, colonne)
 
-    def verifier_coup_valide(self, position_depart ):
+    def verifier_coup_valide(self, position_depart, colonne, ligne):
+        self.Canvas_echiquier.dessiner_case()
+        self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
+        self.Canvas_echiquier.dessiner_piece()
+
         for ligne in self.Canvas_echiquier.partie.echiquier.chiffres_rangees:
             for colonne in self.Canvas_echiquier.partie.echiquier.lettres_colonnes:
                 position_arriver = "{}{}".format(colonne,ligne)
                 if self.Canvas_echiquier.partie.echiquier.deplacement_est_valide(position_depart,position_arriver):
                     print("deplacement valide de ", position_depart, " à ", position_arriver)
 ##############todo arriver à changer couleur
-                    #self.Canvas_echiquier.changer_couleur_position(colonne,ligne)
-                    pass
+
+                    nom_case = "case{}{}".format(colonne,ligne)
+                    case = self.Canvas_echiquier.find_withtag(nom_case)
+                    self.Canvas_echiquier.itemconfig(case, fill = "blue")
+
 
     def selectionner_arriver(self, ligne, colonne):
         position = "{}{}".format(self.Canvas_echiquier.partie.echiquier.lettres_colonnes[colonne], int(self.Canvas_echiquier.partie.echiquier.chiffres_rangees[self.Canvas_echiquier.n_ligne- ligne - 1]))
@@ -308,7 +321,8 @@ class fenetre(Tk,menu_global):
                 piece = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
                 self.position_depart_selectionnee = position
                 self.piece_selectionner = piece
-                self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
+
+                self.verifier_coup_valide(position, colonne, ligne)
 
             #self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
         self.position_arriver_selectionnee = position
@@ -333,8 +347,6 @@ class fenetre(Tk,menu_global):
 
             self.partie.echiquier.deplacer(self.position_depart_selectionnee,self.position_arriver_selectionnee)
 
-            self.Canvas_echiquier.dessiner_piece()
-
             if self.Canvas_echiquier.partie.partie_terminee() == True:
                 self.annoncer_partie_gagner()
 
@@ -343,6 +355,8 @@ class fenetre(Tk,menu_global):
             return None
 
     def changer_de_tour(self):
+        self.Canvas_echiquier.dessiner_case()
+        self.Canvas_echiquier.dessiner_piece()
         self.piece_selectionner = None
         self.messages['text'] = ' '
         self.Canvas_echiquier.supprimer_selection()
