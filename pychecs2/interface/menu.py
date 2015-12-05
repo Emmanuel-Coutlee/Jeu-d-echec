@@ -127,6 +127,8 @@ class menu_global():
 
         self.messages_piece_blanc['text'] = "Pièce blanc:"
         self.messages_piece_noir['text'] = "Pièce noir:"
+        self.Canvas_echiquier.piece_blanc_perdu = ""
+        self.Canvas_echiquier.piece_noir_perdu = ""
         self.deselectionner_piece(None)
         self.Canvas_echiquier.liste_mouvement_effectuer = []
         self.listbox_mouvement.delete(0,END)
@@ -244,18 +246,23 @@ class menu_global():
             self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces = dictionaire
             self.Canvas_echiquier.liste_mouvement_effectuer = liste_mouvement
 
+            self.listbox_mouvement.delete(0,END)
+            self.Canvas_echiquier.piece_blanc_perdu = ""
+            self.Canvas_echiquier.piece_noir_perdu = ""
+
             self.nombre_déplacement = 0
 
             for mouvement in liste_mouvement:
                 self.message_mouvement(mouvement)
 
+            self.Canvas_echiquier.dernier_mouvement_effectuer = self.Canvas_echiquier.liste_mouvement_effectuer[-1]
 
-            self.messages_piece_blanc['text'] = "Pièce blanc:"
-            self.messages_piece_noir['text'] = "Pièce noir:"
+            self.listbox_mouvement.see(END)
 
             self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
+            self.messages['text'] = ""
+            self.Canvas_echiquier.dessiner_case()
             self.Canvas_echiquier.dessiner_piece()
-            self.listbox_mouvement.delete(0,END)
             self.popup_charger.destroy()
         except FileNotFoundError:
             self.messages_charger['text'] = "***ATTENTION!***\nVous n'avez sélectionné aucune partie.\nVeuillez choisir une partie."

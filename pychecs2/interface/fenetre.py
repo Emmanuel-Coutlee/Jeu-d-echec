@@ -144,7 +144,6 @@ class Fenetre(Tk,menu_global):
 
         self.Canvas_echiquier.grid(sticky=NSEW,column = 1 ,row=0)
 
-###########################################
         self.creation_frame_rangee()
         self.affiche_liste_rangee.grid(column= 0,row =0 )
 
@@ -155,7 +154,7 @@ class Fenetre(Tk,menu_global):
         self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
         self.messages_joueur.grid(column = 1, row = 3)
 
-        self.messages= Label(self,font=('Deja Vu', 13))
+        self.messages= Label(self,font=('Deja Vu', 12))
         self.messages.grid( column= 1, row=4)
 
         self.messages_piece = Label(self,font=('Deja Vu', 11))
@@ -186,35 +185,35 @@ class Fenetre(Tk,menu_global):
         self.frame = Frame(self)
 
 
-        self.messages_temps_jeu = Label(self.frame)
+        self.messages_temps_jeu = Label(self.frame,font=('Deja Vu', 12))
         self.messages_temps_jeu['text'] = "Temps de jeu"
         self.messages_temps_jeu.grid(column= 0,row=0 , columnspan= 2,padx= 10, pady= 10)
 
-        self.messages_temps_jeu_blanc = Label(self.frame)
+        self.messages_temps_jeu_blanc = Label(self.frame,font=('Deja Vu', 10))
         self.messages_temps_jeu_blanc['text'] = "Pièce blanc:"
         self.messages_temps_jeu_blanc.grid(column= 0, row = 1)
-        self.messages_temps_jeu_noir = Label(self.frame)
+        self.messages_temps_jeu_noir = Label(self.frame,font=('Deja Vu', 10))
         self.messages_temps_jeu_noir['text'] = "Pièce noir:"
         self.messages_temps_jeu_noir.grid(column=0, row=2)
 
-        self.temps_jeu_blanc = Label(self.frame)
+        self.temps_jeu_blanc = Label(self.frame,font=('Deja Vu', 10))
         self.temps_jeu_blanc['text'] = "temps"
         self.temps_jeu_blanc.grid(column= 1, row = 1)
-        self.temps_jeu_noir = Label(self.frame)
+        self.temps_jeu_noir = Label(self.frame,font=('Deja Vu', 10))
         self.temps_jeu_noir['text'] = "temps"
         self.temps_jeu_noir.grid(column=1, row=2)
 
-        self.messages_mouvement = Label(self.frame)
+        self.messages_mouvement = Label(self.frame,font=('Deja Vu', 12))
         self.messages_mouvement['text'] = "Mouvement joué:"
         self.messages_mouvement.grid(column= 0,row=3 , columnspan= 2,padx= 110, pady= 15, sticky= N)
 
         self.creation_frame_mouvement()
         self.frame_mouvement.grid(column= 0,row=4, columnspan= 2,sticky= NSEW)
 
-        self.bouton_annuler_dernier_coup = Button(self.frame, text="Voir le\ndernier coup", command = self.voir_dernier_mouvement,width = 15)
+        self.bouton_annuler_dernier_coup = Button(self.frame,font=('Deja Vu', 11), text="Voir le\ndernier coup", command = self.voir_dernier_mouvement,width = 15)
         self.bouton_annuler_dernier_coup.grid(column = 0, row = 5, pady= 15)
 
-        self.bouton_annuler_dernier_coup = Button(self.frame, text="Annuler le\ndernier coup", command = self.annuler_mouvement,width = 15)
+        self.bouton_annuler_dernier_coup = Button(self.frame,font=('Deja Vu', 11), text="Annuler le\ndernier coup", command = self.annuler_mouvement,width = 15)
         self.bouton_annuler_dernier_coup.grid(column = 1, row = 5, pady= 15)
 
     def creation_frame_mouvement(self):
@@ -231,7 +230,7 @@ class Fenetre(Tk,menu_global):
 
 
         for rangee in self.Canvas_echiquier.chiffres_rangees_inverse:
-            self.chiffres_rangees= Label(self.affiche_liste_rangee,height= self.Canvas_echiquier.n_pixels_par_case//20)
+            self.chiffres_rangees= Label(self.affiche_liste_rangee,width = 2,height= self.Canvas_echiquier.n_pixels_par_case//20)
             self.chiffres_rangees['text'] = rangee
 
             self.chiffres_rangees.grid()
@@ -254,7 +253,7 @@ class Fenetre(Tk,menu_global):
         #todo modifier le label pour le rendre beau
         self.popup_gagner = Toplevel()
         self.popup_gagner.title("Partie Terminer")
-        self.messages_gagner = Label(self.popup_gagner)
+        self.messages_gagner = Label(self.popup_gagner,font=('Deja Vu', 12))
         self.messages_gagner['text'] = "Félicitation! \nLe joueur {} à gagné la partie!\n\n Voulez-vous jouer une nouvelle partie?".format(self.partie.joueur_actif)
         self.messages_gagner.grid(columnspan = 2)
 
@@ -438,10 +437,7 @@ class Fenetre(Tk,menu_global):
             self.listbox_mouvement.selection_clear(0, END)
 
     def ajouter_piece_manger(self, piece_mange):
-        if piece_mange == None:
-            self.messages_piece_blanc['text'] = "Pièces blanches:" +self.Canvas_echiquier.piece_blanc_perdu
-            self.messages_piece_noir['text'] = "Pièces noirs:"+self.Canvas_echiquier.piece_noir_perdu
-        elif piece_mange.couleur == "blanc":
+        if piece_mange.couleur == "blanc":
             self.Canvas_echiquier.piece_blanc_perdu  += str(piece_mange)
             self.messages_piece_blanc['text'] = "Pièces blanches:" +self.Canvas_echiquier.piece_blanc_perdu
 
@@ -461,11 +457,15 @@ class Fenetre(Tk,menu_global):
             case = self.Canvas_echiquier.find_withtag(nom_case)
             self.Canvas_echiquier.itemconfig(case, fill = "medium orchid1")
 
-            self.messages['text'] = "Voici le dernier mouvement effectué: déplacement de la case verte à la case mauve"
+            self.messages['foreground'] = 'blue'
+            self.messages['text'] = "Dernier mouvement effectué: déplacement de la case verte à la case mauve"
 
         except (IndexError):
             self.messages['foreground'] = 'red'
             self.messages['text'] = "Il n'y a aucun coup de joué pour le moment."
+
+    #def lire_liste_de_mouvement(self, mouvement):
+
 
 if __name__ == '__main__':
     f = Fenetre()
