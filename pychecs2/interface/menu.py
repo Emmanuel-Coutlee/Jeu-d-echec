@@ -205,20 +205,13 @@ class menu_global():
 
         joueur_actif = self.Canvas_echiquier.partie.joueur_actif
 
-        pickle.dump((joueur_actif,dictionaire), open(nom_fichier+".p",'wb'))
+        liste_mouvement = self.Canvas_echiquier.liste_mouvement_effectuer
 
-        #ecriture_csv = csv.writer(fichier_ecriture)
+        piece_blanc_perdu = self.Canvas_echiquier.piece_blanc_perdu
 
-        #echiquier.Echiquier.initialiser_echiquier_depart.dictionnaire_pieces
-        #dictionaire = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces
-        #for cle, valeur in dictionaire.items():
-            #ecriture_csv.writerow([cle,valeur])
-            # piece = str("{} {}".format(cle, dictionaire[valeur]))
-            #fichier_ecriture.write(piece)
+        piece_noir_perdu = self.Canvas_echiquier.piece_noir_perdu
 
-        #On fait un retour de chariot dans le fichier de sortie pour séparer les entiers chiffrés dans le fichier.
-            #fichier_ecriture.write("\n")
-        #fichier_ecriture.close()
+        pickle.dump((joueur_actif,dictionaire,liste_mouvement), open(nom_fichier+".p",'wb'))
 
         self.confirmation(nouvelle_partie,quitter)
 
@@ -235,25 +228,34 @@ class menu_global():
 
     def ecraser_partie(self,nom_fichier,nouvelle_partie, quitter):
         dictionaire = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces
-
+        liste_mouvement = self.Canvas_echiquier.liste_mouvement_effectuer
         joueur_actif = self.Canvas_echiquier.partie.joueur_actif
 
-        pickle.dump((joueur_actif,dictionaire), open(nom_fichier+".p",'wb'))
+        pickle.dump((joueur_actif,dictionaire, liste_mouvement), open(nom_fichier+".p",'wb'))
         self.popup_ecraser.destroy()
         self.confirmation(nouvelle_partie,quitter)
 
     def charger_partie(self, nom_partie):
         #lire le ficher partie_echec
         try:
-            #fichier_lecture = open(nom_partie,'r',encoding="utf-8")
 
-            (self.Canvas_echiquier.partie.joueur_actif,self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces) = pickle.load(open(nom_partie+".p","rb"))
+            (joueur_actif,dictionaire, liste_mouvement ) = pickle.load(open(nom_partie+".p","rb"))
+            self.Canvas_echiquier.partie.joueur_actif = joueur_actif
+            self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces = dictionaire
+            self.Canvas_echiquier.liste_mouvement_effectuer = liste_mouvement
 
-            #for cle, valeur in csv.reader(fichier_lecture):
-                #self.dictionnaire_pieces[cle]= eval(valeur)
-            #fichier_lecture.close()
+            self.nombre_déplacement = 0
+
+            for mouvement in liste_mouvement:
+                self.message_mouvement(mouvement)
+
+
+            self.messages_piece_blanc['text'] = "Pièce blanc:"
+            self.messages_piece_noir['text'] = "Pièce noir:"
+
             self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
             self.Canvas_echiquier.dessiner_piece()
+            self.listbox_mouvement.delete(0,END)
             self.popup_charger.destroy()
         except FileNotFoundError:
             self.messages_charger['text'] = "***ATTENTION!***\nVous n'avez sélectionné aucune partie.\nVeuillez choisir une partie."
