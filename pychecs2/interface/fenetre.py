@@ -331,7 +331,7 @@ class Fenetre(Tk,menu_global):
 
             self.piece_mange = self.Canvas_echiquier.partie.echiquier.recuperer_piece_a_position(self.position_arriver_selectionnee)
 
-            self.Canvas_echiquier.dernier_mouvement_effectuer = [self.piece_selectionner,self.position_depart_selectionnee,self.position_arriver_selectionnee, self.piece_mange]
+            self.Canvas_echiquier.dernier_mouvement_effectuer = [self.Canvas_echiquier.partie.joueur_actif,self.piece_selectionner,self.position_depart_selectionnee,self.position_arriver_selectionnee, self.piece_mange]
 
             self.Canvas_echiquier.liste_mouvement_effectuer += [self.Canvas_echiquier.dernier_mouvement_effectuer]
 
@@ -361,37 +361,38 @@ class Fenetre(Tk,menu_global):
         self.joueur_actif = self.partie.joueur_suivant()
         self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
 
-
+#todo dernier mouvement effectuer ne change pas après annulation
     def annuler_mouvement(self):
         try:
             mouvement = self.Canvas_echiquier.liste_mouvement_effectuer[-1]
             self.nombre_déplacement -=1
-            if mouvement[3] is not None:
-                self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[2]]= mouvement[3]
-                self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[1]]= mouvement[0]
+            if mouvement[4] is not None:
+                self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[3]]= mouvement[4]
+                self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[2]]= mouvement[1]
 
-                if mouvement[3].couleur == "blanc":
+                if mouvement[4].couleur == "blanc":
                     self.Canvas_echiquier.piece_blanc_perdu  = self.Canvas_echiquier.piece_blanc_perdu [:-1]
                     self.messages_piece_blanc['text'] = "Pièces blanches:" +self.Canvas_echiquier.piece_blanc_perdu
 
 
-                if mouvement[3].couleur == "noir":
+                if mouvement[4].couleur == "noir":
                     self.Canvas_echiquier.piece_noir_perdu = self.Canvas_echiquier.piece_noir_perdu [:-1]
                     self.messages_piece_noir['text']= "Pièces noirs:"+self.Canvas_echiquier.piece_noir_perdu
 
                 self.changer_de_tour()
                 del self.Canvas_echiquier.liste_mouvement_effectuer[-1]
-                self.Canvas_echiquier._effectuer = self.Canvas_echiquier.liste_mouvement_effectuer[-1]
+                self.Canvas_echiquier.dernier_mouvement_effectuer_effectuer = self.Canvas_echiquier.liste_mouvement_effectuer[-1]
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
                 self.Canvas_echiquier.dessiner_piece()
             else:
-                self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[1]]= mouvement[0]
-                del self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[2]]
+                self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[2]]= mouvement[1]
+                del self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[3]]
                 self.changer_de_tour()
                 del self.Canvas_echiquier.liste_mouvement_effectuer[-1]
+                self.Canvas_echiquier.dernier_mouvement_effectuer_effectuer = self.Canvas_echiquier.liste_mouvement_effectuer[-1]
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
@@ -408,16 +409,16 @@ class Fenetre(Tk,menu_global):
 
 
     def message_mouvement(self,mouvement):
-        couleur_piece_depart = mouvement[0].couleur
+        couleur_piece_depart = mouvement[1].couleur
 
         self.nombre_déplacement += 1
 
-        if mouvement[3] is not None:
-            couleur_piece_arriver = mouvement[3].couleur
-            numero_deplacement = "Déplacement {}: Joueur {}".format(self.nombre_déplacement, self.Canvas_echiquier.partie.joueur_actif)
-            text_mouvement= "Le {} {} se déplace de la case {} à {}".format(mouvement[0].__class__.__name__,couleur_piece_depart,mouvement[1],mouvement[2])
-            text_manger ="Puis, mange le {} {}".format(mouvement[3].__class__.__name__, couleur_piece_arriver)
-            self.ajouter_piece_manger(mouvement[3])
+        if mouvement[4] is not None:
+            couleur_piece_arriver = mouvement[4].couleur
+            numero_deplacement = "Déplacement {}: Joueur {}".format(self.nombre_déplacement, mouvement[0])
+            text_mouvement= "Le {} {} se déplace de la case {} à {}".format(mouvement[1].__class__.__name__,couleur_piece_depart,mouvement[2],mouvement[3])
+            text_manger ="Puis, mange le {} {}".format(mouvement[4].__class__.__name__, couleur_piece_arriver)
+            self.ajouter_piece_manger(mouvement[4])
             self.listbox_mouvement.insert(END,numero_deplacement)
             self.listbox_mouvement.itemconfig(END,fg= "blue")
             self.listbox_mouvement.insert(END, text_mouvement)
@@ -428,8 +429,8 @@ class Fenetre(Tk,menu_global):
 
         else:
 
-            numero_deplacement = "Déplacement {}: Joueur {}".format(self.nombre_déplacement,self.Canvas_echiquier.partie.joueur_actif)
-            text_mouvement= "Le {} {} se déplace de la case {} à {}".format(mouvement[0].__class__.__name__,couleur_piece_depart,mouvement[1],mouvement[2])
+            numero_deplacement = "Déplacement {}: Joueur {}".format(self.nombre_déplacement,mouvement[0])
+            text_mouvement= "Le {} {} se déplace de la case {} à {}".format(mouvement[1].__class__.__name__,couleur_piece_depart,mouvement[2],mouvement[3])
             self.listbox_mouvement.insert(END,numero_deplacement)
             self.listbox_mouvement.itemconfig(END,fg= "blue")
             self.listbox_mouvement.insert(END, text_mouvement)
@@ -449,11 +450,11 @@ class Fenetre(Tk,menu_global):
         try:
             mouvement= self.Canvas_echiquier.dernier_mouvement_effectuer
 
-            nom_case = "case{}".format(mouvement[1])
+            nom_case = "case{}".format(mouvement[2])
             case = self.Canvas_echiquier.find_withtag(nom_case)
             self.Canvas_echiquier.itemconfig(case, fill = "green yellow")
 
-            nom_case = "case{}".format(mouvement[2])
+            nom_case = "case{}".format(mouvement[3])
             case = self.Canvas_echiquier.find_withtag(nom_case)
             self.Canvas_echiquier.itemconfig(case, fill = "medium orchid1")
 
