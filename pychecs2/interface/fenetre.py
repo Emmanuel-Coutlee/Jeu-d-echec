@@ -179,44 +179,25 @@ class Fenetre(Tk,menu_global):
 
         self.frame = Frame(self)
 
-
-        self.messages_temps_jeu = Label(self.frame,font=('Deja Vu', 12))
-        self.messages_temps_jeu['text'] = "Temps de jeu"
-        self.messages_temps_jeu.grid(column= 0,row=0 , columnspan= 2,padx= 10, pady= 10)
-
-        self.messages_temps_jeu_blanc = Label(self.frame,font=('Deja Vu', 10))
-        self.messages_temps_jeu_blanc['text'] = "Pièce blanc:"
-        self.messages_temps_jeu_blanc.grid(column= 0, row = 1)
-        self.messages_temps_jeu_noir = Label(self.frame,font=('Deja Vu', 10))
-        self.messages_temps_jeu_noir['text'] = "Pièce noir:"
-        self.messages_temps_jeu_noir.grid(column=0, row=2)
-
-        self.temps_jeu_blanc = Label(self.frame,font=('Deja Vu', 10))
-        self.temps_jeu_blanc['text'] = "temps"
-        self.temps_jeu_blanc.grid(column= 1, row = 1)
-        self.temps_jeu_noir = Label(self.frame,font=('Deja Vu', 10))
-        self.temps_jeu_noir['text'] = "temps"
-        self.temps_jeu_noir.grid(column=1, row=2)
-
         self.messages_mouvement = Label(self.frame,font=('Deja Vu', 12))
         self.messages_mouvement['text'] = "Mouvement joué:"
-        self.messages_mouvement.grid(column= 0,row=3 , columnspan= 2,padx= 110, pady= 15, sticky= N)
+        self.messages_mouvement.grid(column= 0,row=0 , columnspan= 2,padx= 110, pady= 15, sticky= N)
 
         self.creation_frame_mouvement()
-        self.frame_mouvement.grid(column= 0,row=4, columnspan= 2,sticky= NSEW)
+        self.frame_mouvement.grid(column= 0,row=1, columnspan= 2,sticky= NSEW)
 
         self.bouton_annuler_dernier_coup = Button(self.frame,font=('Deja Vu', 11), text="Voir le\ndernier coup", command = self.voir_dernier_mouvement,width = 15)
-        self.bouton_annuler_dernier_coup.grid(column = 0, row = 5, pady= 15)
+        self.bouton_annuler_dernier_coup.grid(column = 0, row = 3, pady= 15)
 
         self.bouton_annuler_dernier_coup = Button(self.frame,font=('Deja Vu', 11), text="Annuler le\ndernier coup", command = self.annuler_mouvement,width = 15)
-        self.bouton_annuler_dernier_coup.grid(column = 1, row = 5, pady= 15)
+        self.bouton_annuler_dernier_coup.grid(column = 1, row = 3, pady= 15)
 
     # Création d'un frame pour pouvoir afficher la liste des mouvements effectués
     def creation_frame_mouvement(self):
         self.frame_mouvement = Frame(self.frame, bg="blue",width = 200,height= 450)
 
         self.scrollbar = Scrollbar(self.frame_mouvement, orient=VERTICAL)
-        self.listbox_mouvement = Listbox(self.frame_mouvement, yscrollcommand=self.scrollbar.set,activestyle = 'none', height = 25)
+        self.listbox_mouvement = Listbox(self.frame_mouvement, yscrollcommand=self.scrollbar.set,activestyle = 'none', height = 30)
         self.scrollbar.config(command=self.listbox_mouvement.yview)
         self.scrollbar.pack(side=RIGHT, fill=Y)
         self.listbox_mouvement.pack(side=LEFT, fill=BOTH, expand=1)
