@@ -292,8 +292,8 @@ class menu_global():
         self.messages_fonction.grid()
         self.fonction_programe = Label(self.popup_fonction)
 
-        #todo remplir ce texte
-        self.texte_fonction_programe = "entrez les fonction ici et crédit"
+        ####################todo remplir ce texte
+        self.texte_fonction_programe = "1) Manger la pièce Roi adverse pour pouvoir gagner la partie." "\n" "2) Vous pouvez annuler le dernier coup joué si besoin.""\n""3) Vous pouvez voir votre dernier coup joué si besoin."
 
         self.fonction_programe['text'] = self.texte_fonction_programe
         self.fonction_programe.grid()
@@ -310,8 +310,8 @@ class menu_global():
         self.regle_du_jeu = Label(self.popup_regle)
 
 
-        #todo remplir ce texte
-        self.texte_regle_du_jeu = "entrez les regle ici"
+        ############################todo remplir ce texte
+        self.texte_regle_du_jeu = "Le jeu d'échecs se joue à deux joueurs qui font évoluer seize pièces chacun, respectivement blanches et noires, sur un échiquier de 64 cases en alternance blanches et noires." "\n" "Pour parler des adversaires, on dit « les Blancs » et « les Noirs »""\n\n""Pour gagner la partie, il faut vous manger la pièce Roi adverse.""\n\n""Le pion se déplace droit devant lui (vers la 8e rangée pour les Blancs et la 1re rangée pour les Noirs) d'une seule case à chaque coup et sans jamais pouvoir reculer.""\n\n"" Cependant, lors de son tout premier déplacement, chaque pion peut avancer d'une ou de deux cases à la fois, au choix du joueur (au premier coup, on ne peut pas déplacer à la fois deux pions d'une case).""\n\n""Le cavalier est la seule pièce sauteuse (sa case d'arrivée doit être soit inoccupée, soit occupée par une pièce adverse, il n'y a pas d'interception possible comme pour les pièces de ligne).""\n\n"" Son mouvement combiné correspond à deux cases dans une direction comme une Tour puis une case dans une direction perpendiculaire toujours comme une Tour.""\n\n""La tour, le fou et la dame sont des pièces à longue portée, cela signifie qu'elles peuvent se déplacer de plusieurs cases en un seul coup, en ligne droite, tant qu'elles ne sont pas limitées par l'obstacle infranchissable que constitue toute autre pièce, adverse ou non.""\n\n""Pour plus d'information, voici le site web des rêglements du jeu:https://fr.wikipedia.org/wiki/R%C3%A8gles_du_jeu_d%27%C3%A9checs                                                "
 
         self.regle_du_jeu['text'] = self.texte_regle_du_jeu
         self.regle_du_jeu.grid()
