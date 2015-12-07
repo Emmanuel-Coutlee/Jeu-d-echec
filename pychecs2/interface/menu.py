@@ -164,32 +164,23 @@ class menu_global():
         self.bouton_annuler.grid(column = 2, row = 2)
 
     def menu_modifier(self):
-        self.popup=Toplevel()
-        self.popup.title("modifier")
-        self.messages_modifier = Label(self.popup)
-        self.messages_modifier['text'] = "Changez les couleurs des cases à votre goût "
+        self.popup_modifier=Toplevel()
+        self.popup_modifier.title("modifier")
+        self.messages_modifier = Label(self.popup_modifier)
+        self.messages_modifier['text'] = "Choisisez un thème et cliquez sur OK "
         self.messages_modifier.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
-        self.messages_modifier_2 = Label(self.popup)
-        self.messages_modifier_3 = Button(self.popup,text="Autre thême", command =self.changer_theme(True),width = 10)
-        self.messages_modifier_3.grid(column = 1, row = 2, pady= 10)
 
-    def changer_couleur_theme(self, type, couleur):
-        if type == 1:
-            self.couleur_1 = couleur
 
-        self.delete('case')
-        self.dessiner_case()
+        self.messages_modifier_0 = Button(self.popup_modifier,text="Thème normal", command =lambda :self.Canvas_echiquier.changer_couleur_theme("white","gray"),width = 15)
+        self.messages_modifier_0.grid(column = 0, row = 1, pady= 10)
 
-        self.dessiner_piece()
+        #todo rajouter autant de bouton avec des thème changer les couleur
+        self.messages_modifier_1 = Button(self.popup_modifier,text="Thème noel", command =lambda :self.Canvas_echiquier.changer_couleur_theme("red","green"),width = 15)
+        self.messages_modifier_1.grid(column = 1, row = 1, pady= 10)
 
-    def changer_theme (self):
-        if self.changer_couleur_theme is True:
 
-            for couleur in self.changer_couleur_theme:
-
-                liste_couleur =['purple','cyan','maroon','green','red','blue','orange','yellow']
-                c = randrange(8) # => génère un nombre aléatoire de 0 à 7
-                self.changer_couleur_theme = liste_couleur[c]
+        self.bouton_ok = Button(self.popup_modifier, text="Ok", command = self.popup_modifier.destroy,width = 10)
+        self.bouton_ok.grid(column = 0, columnspan = 2, row = 2)
 
     def sauvegarder_partie(self, nom_fichier,nouvelle_partie,quitter):
 

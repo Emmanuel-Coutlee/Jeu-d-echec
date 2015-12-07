@@ -75,15 +75,14 @@ class Canvas_echiquier(Canvas):
         self.delete('selection')
 
 
-   # def changer_couleur_theme(self, type, couleur):
-        #if type == 1:
-            #self.couleur_1 = couleur
-        #elif type == 2:
-            #self.couleur_2 = couleur
-        #self.delete('case')
-        #self.dessiner_case()
+    def changer_couleur_theme(self, couleur_1, couleur_2):
 
-        #self.dessiner_piece()
+        self.couleur_1 = couleur_1
+        self.couleur_2 = couleur_2
+        self.delete('case')
+        self.dessiner_case()
+
+        self.dessiner_piece()
 
 
 
@@ -131,14 +130,6 @@ class Fenetre(Tk,menu_global):
 
         self.grid_columnconfigure(1, weight = 1)
         self.grid_rowconfigure(0, weight = 1)
-
-        #self.affiche_liste_rangee = Label(self)
-        #self.affiche_liste_rangee['text'] = "8\n\n\n7\n\n\n6\n\n\n5\n\n\n4\n\n\n3\n\n\n2\n\n\n1"
-        #self.affiche_liste_rangee.grid(column= 0,row =0 )
-
-        #self.affiche_liste_rangee = Label(self)
-        #self.affiche_liste_rangee['text'] = "     a            b             c             d             e             f             g             h"
-        #self.affiche_liste_rangee.grid(column= 1,row =1 )
 
         self.Canvas_echiquier = Canvas_echiquier(self, 80, self.partie)
 
@@ -311,7 +302,7 @@ class Fenetre(Tk,menu_global):
                     case = self.Canvas_echiquier.find_withtag(nom_case)
                     self.Canvas_echiquier.itemconfig(case, fill = "sky blue1")
 
-
+    #todo regarder siles ligne en comentaire servenet...
     def selectionner_arriver(self, ligne, colonne):
         position = "{}{}".format(self.Canvas_echiquier.partie.echiquier.lettres_colonnes[colonne], int(self.Canvas_echiquier.partie.echiquier.chiffres_rangees[self.Canvas_echiquier.n_ligne- ligne - 1]))
         #piece = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
@@ -381,7 +372,7 @@ class Fenetre(Tk,menu_global):
 
                 self.changer_de_tour()
                 del self.Canvas_echiquier.liste_mouvement_effectuer[-1]
-                self.Canvas_echiquier.dernier_mouvement_effectuer_effectuer = self.Canvas_echiquier.liste_mouvement_effectuer[-1]
+                self.Canvas_echiquier.dernier_mouvement_effectuer = self.Canvas_echiquier.liste_mouvement_effectuer[-1]
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
@@ -392,7 +383,6 @@ class Fenetre(Tk,menu_global):
                 del self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[3]]
                 self.changer_de_tour()
                 del self.Canvas_echiquier.liste_mouvement_effectuer[-1]
-                self.Canvas_echiquier.dernier_mouvement_effectuer_effectuer = self.Canvas_echiquier.liste_mouvement_effectuer[-1]
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
@@ -448,6 +438,8 @@ class Fenetre(Tk,menu_global):
 
     def voir_dernier_mouvement(self):
         try:
+            print(self.Canvas_echiquier.liste_mouvement_effectuer)
+            print(self.Canvas_echiquier.dernier_mouvement_effectuer)
             mouvement= self.Canvas_echiquier.dernier_mouvement_effectuer
 
             nom_case = "case{}".format(mouvement[2])
@@ -465,7 +457,6 @@ class Fenetre(Tk,menu_global):
             self.messages['foreground'] = 'red'
             self.messages['text'] = "Il n'y a aucun coup de joué pour le moment."
 
-    #def lire_liste_de_mouvement(self, mouvement):
 
 
 if __name__ == '__main__':
