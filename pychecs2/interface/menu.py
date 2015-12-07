@@ -7,6 +7,7 @@ from random import randrange
 
 
 class menu_global():
+    # Méthode qui crée la barre menu du jeu
     def premier_menu(self):
         self.menu_bar= Menu()
         self.partie_menu = Menu(self.menu_bar, tearoff = 0)
@@ -17,7 +18,6 @@ class menu_global():
 
 
         self.affichage_menu = Menu(tearoff = 0)
-        #################################
         #self.affichage_menu.add_command(label= 'Modifier', command =lambda: self.canvas_echiquier.changer_couleur_theme(2,'green'))
         self.affichage_menu.add_command(label= 'Modifier', command =lambda: self.menu_modifier())
 
@@ -31,6 +31,8 @@ class menu_global():
         self.menu_bar.add_cascade(label= 'Aide', menu= self.aide_menu)
         self.config(menu = self.menu_bar)
 
+
+    # Méthode qui crée un menu pour enregistrer un partie
     def menu_enregistrer(self,nouvelle_partie,quitter):
         self.popup_enregister = Toplevel()
         self.popup_enregister.title("Enregistrer la partie")
@@ -46,6 +48,7 @@ class menu_global():
         self.bouton_sauvegarder.grid(column = 0, row = 2, pady= 10)
         self.bouton_annuler.grid(column = 1, row = 2)
 
+    # Méthode qui crée un menu pour charger une partie sauvegardée
     def menu_charger(self):
         self.popup_charger = Toplevel()
         self.popup_charger.title("Charger une partie")
@@ -60,7 +63,7 @@ class menu_global():
                 return None
 
 
-            fichier_liste_partie = open("liste_partie", 'r',encoding="utf-8")
+            fichier_liste_partie = open("liste_partie", 'r',encoding="utf-8") # ouverture des partie pour pouvoir les supprimer ou charger
             self.messages_charger = Label(self.popup_charger)
             self.messages_charger['text'] = "Choissez une partie à charger ou supprimer."
             self.messages_charger.grid(column = 0, columnspan = 3, row = 0, pady= 10, padx = 15)
@@ -79,13 +82,14 @@ class menu_global():
             self.bouton_charger.grid(column = 0,row = ligne_bouton, pady= 10, sticky = S)
             self.bouton_suprimer.grid(column = 1,row = ligne_bouton, pady= 10, sticky = S)
             self.bouton_annuler.grid(column = 2,row = ligne_bouton, pady = 10, sticky = S )
-        except FileNotFoundError:
+        except FileNotFoundError: #Erreur si le joueur veut ouvrir partie, mais aucune n'a été sauvegardée
             self.messages_charger = Label(self.popup_charger)
             self.messages_charger['text'] = "Il n'y a aucune partie sauvegardé."
             self.messages_charger.grid(column = 0, row = 0, pady= 10, padx = 15)
             self.bouton_ok = Button(self.popup_charger,text="ok",width=10, command =self.popup_charger.destroy)
             self.bouton_ok.grid(pady= 10)
 
+    # Méthode qui permet de supprimer une partie sauvegardé
     def suprimer_partie (self, nom_partie):
         try:
             os.remove(nom_partie+".p")
@@ -99,11 +103,11 @@ class menu_global():
             liste_partie.close()
             self.popup_charger.destroy()
             self.menu_charger()
-        except FileNotFoundError:
+        except FileNotFoundError: #Erreur si le joueur sélectionne aucune partie à supprimer
             self.messages_charger['text'] = "***ATTENTION!***\nVous n'avez sélectionné aucune partie.\nVeuillez choisir une partie."
 
 
-
+    # Méthode qui crée un menu pour nouvelle partie
     def menu_nouvelle_partie(self):
         self.popup_nouvelle = Toplevel()
         self.popup_nouvelle.title("Nouvelle partie")
@@ -118,6 +122,7 @@ class menu_global():
         self.bouton_annuler.grid(column = 2, row = 1, pady = 15)
 
 
+    # Méthode qui permet de créer une nouvelle partie, et de la sauvegarder avant.
     def nouvelle_partie(self):
 
         self.Canvas_echiquier.partie.echiquier.initialiser_echiquier_depart()
@@ -147,7 +152,7 @@ class menu_global():
         except AttributeError:
             pass
 
-
+    # Méthode qui crée un menu pour quitter
     def menu_quitter(self):
 
         self.popup_quitter=Toplevel()
@@ -163,6 +168,7 @@ class menu_global():
         self.bouton_quitter.grid(column = 1, row = 2, pady= 10)
         self.bouton_annuler.grid(column = 2, row = 2)
 
+    # Méthode qui crée un menu pour modifier les couleurs des cases de l'échiquier.
     def menu_modifier(self):
         self.popup_modifier=Toplevel()
         self.popup_modifier.title("modifier")
@@ -175,20 +181,27 @@ class menu_global():
         self.messages_modifier_0.grid(column = 0, row = 1, pady= 10)
 
         #todo rajouter autant de bouton avec des thème changer les couleur
-        self.messages_modifier_1 = Button(self.popup_modifier,text="Thème noel", command =lambda :self.Canvas_echiquier.changer_couleur_theme("red","green"),width = 15)
+        self.messages_modifier_1 = Button(self.popup_modifier,text="Thème noël", command =lambda :self.Canvas_echiquier.changer_couleur_theme("red","green"),width = 15)
         self.messages_modifier_1.grid(column = 1, row = 1, pady= 10)
+
+        self.messages_modifier_1 = Button(self.popup_modifier,text="Thème Feu", command =lambda :self.Canvas_echiquier.changer_couleur_theme("red","Darkorange1"),width = 15)
+        self.messages_modifier_1.grid(column = 2, row = 1, pady= 10)
+
+        self.messages_modifier_1 = Button(self.popup_modifier,text="Thème St-Valentin", command =lambda :self.Canvas_echiquier.changer_couleur_theme("deep pink","red"),width = 15)
+        self.messages_modifier_1.grid(column = 3, row = 1, pady= 10)
 
 
         self.bouton_ok = Button(self.popup_modifier, text="Ok", command = self.popup_modifier.destroy,width = 10)
-        self.bouton_ok.grid(column = 0, columnspan = 2, row = 2)
+        self.bouton_ok.grid(column = 0, columnspan = 1, row = 2)
 
+    #Méthode pour sauvegarder une partie jouée
     def sauvegarder_partie(self, nom_fichier,nouvelle_partie,quitter):
 
-        if os.path.exists(nom_fichier+".p"):
+        if os.path.exists(nom_fichier+".p"): # si la partie existe déjà, demander à l'utilisateur d'écraser la partie existante
             self.menu_ecraser_partie(nom_fichier,nouvelle_partie, quitter)
             return None
 
-        if not os.path.exists("liste_partie"):
+        if not os.path.exists("liste_partie"): # si la partie n'existe pas ouvrir le fichier liste partie pour pouvoir sauvegarder la partie
             fichier_liste_partie = open("liste_partie", 'w',encoding="utf-8")
         else:
             fichier_liste_partie = open("liste_partie", 'a',encoding="utf-8")
@@ -208,6 +221,7 @@ class menu_global():
 
         self.confirmation(nouvelle_partie,quitter)
 
+    #Méthode qui va créer un button pour supprimer une partie existante au même nom.
     def menu_ecraser_partie(self,nom_fichier,nouvelle_partie,quitter):
         self.popup_ecraser=Toplevel()
         self.popup_ecraser.title("Écraser une partie")
@@ -219,6 +233,7 @@ class menu_global():
         self.bouton_sauvegarder.grid(column = 0, row = 1, pady= 10)
         self.bouton_annuler.grid(column = 1, row = 1)
 
+        #Méthode qui permet supprimer la partie existante au nom donné pour la partie voulant être sauvegarder.
     def ecraser_partie(self,nom_fichier,nouvelle_partie, quitter):
         dictionaire = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces
         liste_mouvement = self.Canvas_echiquier.liste_mouvement_effectuer
@@ -228,6 +243,7 @@ class menu_global():
         self.popup_ecraser.destroy()
         self.confirmation(nouvelle_partie,quitter)
 
+    #Méthode qui permet de sélectionner une partie qui a été sauvegardée
     def charger_partie(self, nom_partie):
         #lire le ficher partie_echec
         try:
@@ -258,6 +274,7 @@ class menu_global():
         except FileNotFoundError:
             self.messages_charger['text'] = "***ATTENTION!***\nVous n'avez sélectionné aucune partie.\nVeuillez choisir une partie."
 
+    #Méthode qui crée un POPUP pour avertir les joueurs que la partie a bien été sauvegarder.
     def confirmation(self,nouvelle_partie,quitter):
         self.popup_enregister.destroy()
         self.confirme = Toplevel()
@@ -265,10 +282,10 @@ class menu_global():
         self.messages_confirme = Label(self.confirme)
         self.messages_confirme['text'] = "La sauvegarde à été éffectué avec succès!"
         self.messages_confirme.grid(padx= 10, pady= 10)
-        if nouvelle_partie is True:
+        if nouvelle_partie is True: # Si nouvelle partie est sélectioner, utilise la méthode nouvelle partie
             self.bouton_ok = Button(self.confirme,text="ok",width=10, command =self.nouvelle_partie)
             self.bouton_ok.grid(pady= 10)
-        elif quitter is True:
+        elif quitter is True: # sinon si quitter est sélectionner, utiliser la méthode quitter partie
             self.bouton_ok = Button(self.confirme,text="ok",width=10, command =self.quit)
             self.bouton_ok.grid(pady= 10)
         else:
@@ -292,6 +309,7 @@ class menu_global():
         self.bouton_ok = Button(self.popup_fonction,text="ok",width=10, command =self.popup_fonction.destroy)
         self.bouton_ok.grid(pady= 10)
 
+    # Méthode qui crée un menu pour savoir les rêgle du jeu échec .
     def menu_regle_du_jeu(self):
         self.popup_regle = Toplevel()
         self.popup_regle.title("Règle du jeu")
@@ -302,7 +320,7 @@ class menu_global():
 
 
         ############################todo remplir ce texte
-        self.texte_regle_du_jeu = "Le jeu d'échecs se joue à deux joueurs qui font évoluer seize pièces chacun, respectivement blanches et noires, sur un échiquier de 64 cases en alternance blanches et noires." "\n" "Pour parler des adversaires, on dit « les Blancs » et « les Noirs »""\n\n""Pour gagner la partie, il faut vous manger la pièce Roi adverse.""\n\n""Le pion se déplace droit devant lui (vers la 8e rangée pour les Blancs et la 1re rangée pour les Noirs) d'une seule case à chaque coup et sans jamais pouvoir reculer.""\n\n"" Cependant, lors de son tout premier déplacement, chaque pion peut avancer d'une ou de deux cases à la fois, au choix du joueur (au premier coup, on ne peut pas déplacer à la fois deux pions d'une case).""\n\n""Le cavalier est la seule pièce sauteuse (sa case d'arrivée doit être soit inoccupée, soit occupée par une pièce adverse, il n'y a pas d'interception possible comme pour les pièces de ligne).""\n\n"" Son mouvement combiné correspond à deux cases dans une direction comme une Tour puis une case dans une direction perpendiculaire toujours comme une Tour.""\n\n""La tour, le fou et la dame sont des pièces à longue portée, cela signifie qu'elles peuvent se déplacer de plusieurs cases en un seul coup, en ligne droite, tant qu'elles ne sont pas limitées par l'obstacle infranchissable que constitue toute autre pièce, adverse ou non.""\n\n""Pour plus d'information, voici le site web des rêglements du jeu:https://fr.wikipedia.org/wiki/R%C3%A8gles_du_jeu_d%27%C3%A9checs                                                "
+        self.texte_regle_du_jeu = "Le jeu d'échecs se joue à deux joueurs qui font évoluer seize pièces chacun, respectivement blanches et noires, sur un échiquier de 64 cases en alternance blanches et noires." "\n" "Pour parler des adversaires, on dit « les Blancs » et « les Noirs »""\n\n""Pour gagner la partie, il faut vous manger la pièce Roi adverse.""\n\n""Le pion se déplace droit devant lui (vers la 8e rangée pour les Blancs et la 1re rangée pour les Noirs) d'une seule case à chaque coup et sans jamais pouvoir reculer.""\n\n"" Cependant, lors de son tout premier déplacement, chaque pion peut avancer d'une ou de deux cases à la fois, au choix du joueur (au premier coup, on ne peut pas déplacer à la fois deux pions d'une case).""\n\n""Le cavalier est la seule pièce sauteuse (sa case d'arrivée doit être soit inoccupée, soit occupée par une pièce adverse, il n'y a pas d'interception possible comme pour les pièces de ligne).""\n\n"" Son mouvement combiné correspond à deux cases dans une direction comme une Tour puis une case dans une direction perpendiculaire toujours comme une Tour.""\n\n""La tour, le fou et la dame sont des pièces à longue portée, cela signifie qu'elles peuvent se déplacer de plusieurs cases en un seul coup, en ligne droite, tant qu'elles ne sont pas limitées par l'obstacle infranchissable que constitue toute autre pièce, adverse ou non.""\n\n""Pour plus d'information, voici le site web des rêglements du jeu: https://fr.wikipedia.org/wiki/R%C3%A8gles_du_jeu_d%27%C3%A9checs                                                "
 
         self.regle_du_jeu['text'] = self.texte_regle_du_jeu
         self.regle_du_jeu.grid()
