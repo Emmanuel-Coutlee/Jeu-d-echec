@@ -1,5 +1,5 @@
 from tkinter import Canvas,Tk, Label, NSEW, Menu, Button
-import time
+from pychecs2.echecs.piece import Pion, Tour, Fou, Cavalier, Dame, Roi
 from pychecs2.interface.menu import *
 from pychecs2.echecs.partie import Partie
 
@@ -149,19 +149,19 @@ class Fenetre(Tk,menu_global):
         self.messages_joueur['text'] = "C'est au tour du joueur {}".format(self.partie.joueur_actif)
         self.messages_joueur.grid(column = 1, row = 3)
 
-        self.messages= Label(self,font=('Deja Vu', 12))
-        self.messages.grid( column= 1, row=4)
+        self.messages= Label(self,font=('Deja Vu', 13))
+        self.messages.grid( column= 1, row=4, rowspan=2)
 
         self.messages_piece = Label(self,font=('Deja Vu', 11))
         self.messages_piece['text'] = "Pièces qui on été mangées:"
-        self.messages_piece.grid(column= 1,row =5)
+        self.messages_piece.grid(column= 1,row =6)
 
         self.messages_piece_blanc = Label(self,font=('Deja Vu', 10))
         self.messages_piece_blanc['text'] = "Pièces blanches:"
-        self.messages_piece_blanc.grid(column= 1, row=6)
+        self.messages_piece_blanc.grid(column= 1, row=7)
         self.messages_piece_noir = Label(self, font=('Deja Vu', 10))
         self.messages_piece_noir['text'] = "Pièces noirs:"
-        self.messages_piece_noir.grid(column= 1,row =7)
+        self.messages_piece_noir.grid(column= 1,row =8)
 
 
         self.creation_frame_droite()
@@ -194,7 +194,7 @@ class Fenetre(Tk,menu_global):
 
     # Création d'un frame pour pouvoir afficher la liste des mouvements effectués
     def creation_frame_mouvement(self):
-        self.frame_mouvement = Frame(self.frame, bg="blue",width = 200,height= 450)
+        self.frame_mouvement = Frame(self.frame,width = 200,height= 450,padx= 20)
 
         self.scrollbar = Scrollbar(self.frame_mouvement, orient=VERTICAL)
         self.listbox_mouvement = Listbox(self.frame_mouvement, yscrollcommand=self.scrollbar.set,activestyle = 'none', height = 30)
@@ -259,7 +259,7 @@ class Fenetre(Tk,menu_global):
                 self.position_depart_selectionnee = position
 
                 self.messages['foreground'] = 'blue'
-                self.messages['text'] = 'Pièce séléctionné : {} {} à la position {}'.format(piece.__class__.__name__,piece.couleur, self.position_depart_selectionnee)
+                self.messages['text'] = 'Pièce séléctionné : {} {} à la position {}\nDéplacement valide en bleu.'.format(piece.__class__.__name__,piece.couleur, self.position_depart_selectionnee)
                 self.couleur_piece_selectionner = self.Canvas_echiquier.partie.echiquier.couleur_piece_a_position(position)
                 if self.couleur_piece_selectionner != self.partie.joueur_actif: # Message qui affiche si le joueur actif sélectionne une pièce du joueur adverse.
                     self.messages['foreground'] = 'red'
@@ -298,11 +298,10 @@ class Fenetre(Tk,menu_global):
                 piece = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
                 self.position_depart_selectionnee = position
                 self.piece_selectionner = piece
-                self.messages['text'] = 'Pièce séléctionné : {} à la position {}'.format(piece, self.position_depart_selectionnee)
+                self.messages['text'] = 'Pièce séléctionné : {} {} à la position {}\nDéplacement valide en bleu.'.format(piece.__class__.__name__,piece.couleur, self.position_depart_selectionnee)
 
                 self.verifier_coup_valide(position, colonne, ligne)
 
-            self.Canvas_echiquier.changer_couleur_position(colonne, ligne)
         self.position_arriver_selectionnee = position
         # si le déplacement est valide, nous allons faire appel au méthode, piece mangé, afficher dernier coup effectué, afficher la liste des mouvements,
         if self.partie.echiquier.deplacement_est_valide(self.position_depart_selectionnee,self.position_arriver_selectionnee) is True:
@@ -322,14 +321,46 @@ class Fenetre(Tk,menu_global):
 
             self.partie.echiquier.deplacer(self.position_depart_selectionnee,self.position_arriver_selectionnee)
 
+
             # si la partie est terminé, appel à la méthode annoncer le gagnant.
             if self.Canvas_echiquier.partie.partie_terminee() == True:
                 self.annoncer_partie_gagner()
+
+            elif isinstance(self.piece_selectionner, Pion):
+                if self.piece_selectionner.couleur == "blanc":
+                    if ligne == 0:
+                        self.menu_promotion(self.position_arriver_selectionnee, "blanc")
+
+                if self.piece_selectionner.couleur == "noir":
+                    if ligne == 7:
+                        self.menu_promotion(self.position_arriver_selectionnee,"noir")
 
             self.changer_de_tour()
 
         else:
             return None
+
+    def menu_promotion(self,position, couleur):
+        self.popup_promotion = Toplevel()
+        self.popup_promotion.title("Promotion du pion")
+        self.messages_promotion = Label(self.popup_promotion)
+        self.messages_promotion['text'] = "Choisisez la pièce qui remplacera le pion"
+        self.messages_promotion.grid(row= 0,columnspan = 2,padx= 10, pady= 10)
+
+        self.bouton_reine = Button(self.popup_promotion,text="Reine",width=10, command =lambda :self.promotion(position, Dame, couleur))
+        self.bouton_reine.grid(row= 1,column= 0,pady= 10)
+        self.bouton_fou = Button(self.popup_promotion,text="Fou",width=10, command =lambda :self.promotion(position, Fou, couleur))
+        self.bouton_fou.grid(row= 1,column= 1,pady= 10)
+        self.bouton_cavalier = Button(self.popup_promotion,text="Cavalier",width=10, command =lambda :self.promotion(position, Cavalier, couleur))
+        self.bouton_cavalier.grid(row= 2,column= 0,pady= 10)
+        self.bouton_tour = Button(self.popup_promotion,text="Tour",width=10, command =lambda :self.promotion(position, Tour, couleur))
+        self.bouton_tour.grid(row= 2,column= 1,pady= 10)
+
+    def promotion(self, position,piece, couleur):
+        self.popup_promotion.destroy()
+        self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]=piece(couleur)
+        self.Canvas_echiquier.dessiner_case()
+        self.Canvas_echiquier.dessiner_piece()
 
     def changer_de_tour(self):
         self.Canvas_echiquier.dessiner_case()
@@ -441,7 +472,7 @@ class Fenetre(Tk,menu_global):
             self.Canvas_echiquier.itemconfig(case, fill = "medium orchid1")
 
             self.messages['foreground'] = 'blue'
-            self.messages['text'] = "Dernier mouvement effectué: déplacement de la case verte à la case mauve"
+            self.messages['text'] = "Dernier mouvement effectué:\ndéplacement de la case verte à la case mauve"
 
         except (IndexError): # Message d'erreur si aucun coup joué
             self.messages['foreground'] = 'red'
