@@ -163,15 +163,13 @@ class Fenetre(Tk,menu_global):
         self.messages_piece_noir['text'] = "Pièces noirs:"
         self.messages_piece_noir.grid(column= 1,row =8)
 
-
         self.creation_frame_droite()
         self.frame.grid(column = 2, row=0, rowspan=8, sticky = NSEW)
-
 
         self.Canvas_echiquier.bind('<Button-1>', self.selectionner_piece)
         self.Canvas_echiquier.bind('<Button-3>', self.deselectionner_piece)
 
-        self.premier_menu()
+        self.menu_bar_principal()
 
 
     #Création d'un frame à droit de l'échiquier pour avoir le temps joué des joueurs et la liste des déplacements effectués
@@ -228,7 +226,6 @@ class Fenetre(Tk,menu_global):
 
     # Méthode qui va permettre d'afficher le gagnant de la partie lorsque le Roi adverse a été "mangé".
     def annoncer_partie_gagner(self):
-        #todo modifier le label pour le rendre beau
         self.popup_gagner = Toplevel()
         self.popup_gagner.title("Partie Terminer")
         self.messages_gagner = Label(self.popup_gagner,font=('Deja Vu', 12))
@@ -268,11 +265,11 @@ class Fenetre(Tk,menu_global):
                 self.piece_selectionner = piece
 
                 self.verifier_coup_valide(position, colonne, ligne)
-            except KeyError: #Message d'erreur qui se lance lorsqu'il a aucune pièce qui est selectionnée
+            except KeyError: #Message d'erreur qui se lance lorsqu'il a aucune pièce sur la case sélectionné
                 self.messages['foreground'] = 'red'
                 self.messages['text'] = 'erreur aucune piece ici'
 
-
+        #S'il y a une pièce déjà selectionné onva vers la fonction qui selectionne l'arriver
         else:
             self.selectionner_arriver(ligne, colonne)
     # Méthode qui permet d'afficher au joueur actif, les coups valides pour la pièce sélectionné
@@ -290,10 +287,12 @@ class Fenetre(Tk,menu_global):
                     case = self.Canvas_echiquier.find_withtag(nom_case)
                     self.Canvas_echiquier.itemconfig(case, fill = "sky blue1")
 
-    # Méthode qui
+    # Méthode qui sélectionne la case d'arriver
     def selectionner_arriver(self, ligne, colonne):
         position = "{}{}".format(self.Canvas_echiquier.partie.echiquier.lettres_colonnes[colonne], int(self.Canvas_echiquier.partie.echiquier.chiffres_rangees[self.Canvas_echiquier.n_ligne- ligne - 1]))
+        #cas s'il y a une pièce sur la case d'arriver
         if self.Canvas_echiquier.partie.echiquier.recuperer_piece_a_position(position) is not None:
+            #si le joueur sélectionne une pièce de sa couleur on change la pièce sélectionné
             if self.couleur_piece_selectionner == self.Canvas_echiquier.partie.echiquier.couleur_piece_a_position(position):
                 piece = self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]
                 self.position_depart_selectionnee = position
@@ -325,7 +324,7 @@ class Fenetre(Tk,menu_global):
             # si la partie est terminé, appel à la méthode annoncer le gagnant.
             if self.Canvas_echiquier.partie.partie_terminee() == True:
                 self.annoncer_partie_gagner()
-
+            #promotion du pion s'il arrive à l'extremité de l'échiquier
             elif isinstance(self.piece_selectionner, Pion):
                 if self.piece_selectionner.couleur == "blanc":
                     if ligne == 0:
@@ -336,10 +335,11 @@ class Fenetre(Tk,menu_global):
                         self.menu_promotion(self.position_arriver_selectionnee,"noir")
 
             self.changer_de_tour()
-
+        #si le déplacement n'est pas valide on sort de la fonction
         else:
             return None
 
+    #fenetre de la promotion du pion
     def menu_promotion(self,position, couleur):
         self.popup_promotion = Toplevel()
         self.popup_promotion.title("Promotion du pion")
@@ -356,12 +356,14 @@ class Fenetre(Tk,menu_global):
         self.bouton_tour = Button(self.popup_promotion,text="Tour",width=10, command =lambda :self.promotion(position, Tour, couleur))
         self.bouton_tour.grid(row= 2,column= 1,pady= 10)
 
+    #fonction de promotion on remplace le pion par la pièce désirer dans le dictionaire
     def promotion(self, position,piece, couleur):
         self.popup_promotion.destroy()
         self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[position]=piece(couleur)
         self.Canvas_echiquier.dessiner_case()
         self.Canvas_echiquier.dessiner_piece()
 
+    #fonction qui change le joueur actif et qui remet la fenetre et la selection par défaut.
     def changer_de_tour(self):
         self.Canvas_echiquier.dessiner_case()
         self.Canvas_echiquier.dessiner_piece()
@@ -376,10 +378,12 @@ class Fenetre(Tk,menu_global):
         try:
             mouvement = self.Canvas_echiquier.liste_mouvement_effectuer[-1]
             self.nombre_déplacement -=1
+            #cas s'il y avait une pièce de mangé
             if mouvement[4] is not None:
                 self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[3]]= mouvement[4]
                 self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[2]]= mouvement[1]
 
+                #on enleve la pièce perdu de la liste des pièce perdu
                 if mouvement[4].couleur == "blanc":
                     self.Canvas_echiquier.piece_blanc_perdu  = self.Canvas_echiquier.piece_blanc_perdu [:-1]
                     self.messages_piece_blanc['text'] = "Pièces blanches:" +self.Canvas_echiquier.piece_blanc_perdu
@@ -388,7 +392,7 @@ class Fenetre(Tk,menu_global):
                 if mouvement[4].couleur == "noir":
                     self.Canvas_echiquier.piece_noir_perdu = self.Canvas_echiquier.piece_noir_perdu [:-1]
                     self.messages_piece_noir['text']= "Pièces noirs:"+self.Canvas_echiquier.piece_noir_perdu
-
+                #on change de tour et on enleve le mouvement de la liste
                 self.changer_de_tour()
                 del self.Canvas_echiquier.liste_mouvement_effectuer[-1]
                 self.Canvas_echiquier.dernier_mouvement_effectuer = self.Canvas_echiquier.liste_mouvement_effectuer[-1]
@@ -397,6 +401,7 @@ class Fenetre(Tk,menu_global):
                 self.listbox_mouvement.delete(END)
                 self.listbox_mouvement.delete(END)
                 self.Canvas_echiquier.dessiner_piece()
+            #cas s'il n'y a pas de pièce mangé
             else:
                 self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[2]]= mouvement[1]
                 del self.Canvas_echiquier.partie.echiquier.dictionnaire_pieces[mouvement[3]]
@@ -407,6 +412,7 @@ class Fenetre(Tk,menu_global):
                 self.listbox_mouvement.delete(END)
                 self.Canvas_echiquier.dessiner_piece()
                 vide = []
+                #cas s'il n'y a pas d'autre mouvement à annuler
                 if self.Canvas_echiquier.liste_mouvement_effectuer == vide:
                     self.Canvas_echiquier.dernier_mouvement_effectuer = vide
                 else:
@@ -416,12 +422,12 @@ class Fenetre(Tk,menu_global):
             self.messages['foreground'] = 'red'
             self.messages['text'] = "Il n'y a aucun coup de joué pour le moment."
 
-    #
+    #Fonction qui crée les messages des mouvement et qui l'ajoute à la liste de la fenetre
     def message_mouvement(self,mouvement):
         couleur_piece_depart = mouvement[1].couleur
 
         self.nombre_déplacement += 1
-
+        #cas s'il y a une pièce de manger
         if mouvement[4] is not None:
             couleur_piece_arriver = mouvement[4].couleur
             numero_deplacement = "Déplacement {}: Joueur {}".format(self.nombre_déplacement, mouvement[0])
@@ -435,7 +441,7 @@ class Fenetre(Tk,menu_global):
             self.listbox_mouvement.itemconfig(END,fg= "red")
             self.listbox_mouvement.insert(END,"")
             self.listbox_mouvement.selection_clear(0, END)
-
+        #cas s'il n'y a pas de pièce de manger
         else:
 
             numero_deplacement = "Déplacement {}: Joueur {}".format(self.nombre_déplacement,mouvement[0])
@@ -448,10 +454,11 @@ class Fenetre(Tk,menu_global):
 
     # Méthode qui affiche tous les pièces "mangées" de l'échiquier
     def ajouter_piece_manger(self, piece_mange):
+        #affiche les pièces blanche
         if piece_mange.couleur == "blanc":
             self.Canvas_echiquier.piece_blanc_perdu  += str(piece_mange)
             self.messages_piece_blanc['text'] = "Pièces blanches:" +self.Canvas_echiquier.piece_blanc_perdu
-
+        #affiche les pièce noir
         elif piece_mange.couleur == "noir":
             self.Canvas_echiquier.piece_noir_perdu += str(piece_mange)
             self.messages_piece_noir['text'] = "Pièces noirs:"+self.Canvas_echiquier.piece_noir_perdu

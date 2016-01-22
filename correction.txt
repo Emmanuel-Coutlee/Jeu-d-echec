@@ -5,7 +5,7 @@ Nom coéquipier 2 :Emmanuel Coutlée
 Numéro de dossier (matricule) coéquipier 1 :111 071 166
 Numéro de dossier (matricule) coéquipier 2 :111 122 195
 
-Temps de réalisation total (estimé) : X heures
+Temps de réalisation total (estimé) : 50 heures chacun
 
 
 
@@ -30,6 +30,7 @@ Fonctionnalités obligatoires
       Commentaires :
 
 /5 : La fin de la partie est détectée et affichée
+* utilisez la partie sauvegarder: Partie_test_promotion_et_gagner
       Commentaires :
 
 /5 : On peut sauvegarder une partie via un bouton
@@ -69,6 +70,30 @@ Pour les fonctionnalités avec une *, vous DEVEZ indiquer ici quel fichier de
 sauvegarde ouvrir et quels déplacements effectuer pour que le correcteur puisse
 évaluer votre fonctionnalité.
 
+1 : Option de lire les règlement du jeu
+      Commentaires:
+
+2 : Afficharge d'une liste des déplacement effectués
+      Commentaires:
+
+3 : Permettre d'annuler le dernier mouvement
+      Commentaires:
+
+5 : Après la sélection, afficher les déplacements et prises valides
+      Commentaires:
+
+7 : Permettre de changer le thème (couleurs, etc.)
+      Commentaires:
+
+10 : Afficher les pièces que chaque joueur a perdu
+      Commentaires:
+
+12 : Demander si on veut sauvegarder avant de quitter/charger
+      Commentaires:
+
+19 : ⋆Règles avancées : « promotion » du pion
+* utiliser la partie sauvegarder: Partie_test_promotion_et_gagner
+      Commentaires:
 
 Total: /30
 

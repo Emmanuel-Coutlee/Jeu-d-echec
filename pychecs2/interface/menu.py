@@ -8,7 +8,7 @@ from random import randrange
 
 class menu_global():
     # Méthode qui crée la barre menu du jeu
-    def premier_menu(self):
+    def menu_bar_principal(self):
         self.menu_bar= Menu()
         self.partie_menu = Menu(self.menu_bar, tearoff = 0)
         self.partie_menu.add_command(label= 'Nouvelle partie', command = lambda:self.menu_nouvelle_partie())
@@ -18,7 +18,6 @@ class menu_global():
 
 
         self.affichage_menu = Menu(tearoff = 0)
-        #self.affichage_menu.add_command(label= 'Modifier', command =lambda: self.canvas_echiquier.changer_couleur_theme(2,'green'))
         self.affichage_menu.add_command(label= 'Modifier', command =lambda: self.menu_modifier())
 
 
@@ -54,6 +53,7 @@ class menu_global():
         self.popup_charger.title("Charger une partie")
 
         try:
+            #Si la liste de partie est vide
             if os.stat("liste_partie").st_size ==0:
                 self.messages_charger = Label(self.popup_charger)
                 self.messages_charger['text'] = "Il n'y a aucune partie sauvegardé."
@@ -112,7 +112,7 @@ class menu_global():
         self.popup_nouvelle = Toplevel()
         self.popup_nouvelle.title("Nouvelle partie")
         self.messages_nouvelle = Label(self.popup_nouvelle)
-        self.messages_nouvelle['text'] = "Vous allez commencer une nouvelle partie.Voulez-vous enregistrer la partie en cour?"
+        self.messages_nouvelle['text'] = "Vous allez commencer une nouvelle partie.Voulez-vous enregistrer la partie en cours?"
         self.messages_nouvelle.grid(column = 0, columnspan = 3, row = 0, pady= 10, padx = 20)
         self.bouton_oui = Button(self.popup_nouvelle,text="Oui", command =lambda:self.menu_enregistrer(True,False),width = 10)
         self.bouton_non = Button(self.popup_nouvelle,text="Non", command =lambda:self.nouvelle_partie(),width = 10)
@@ -142,6 +142,7 @@ class menu_global():
         #la fenetre n'existe pas donc on ne ferme rien
         except AttributeError:
             pass
+        #la fenetre n'existe pas donc on ne ferme rien
         try:
             self.confirme.destroy()
         except AttributeError:
@@ -174,25 +175,24 @@ class menu_global():
         self.popup_modifier.title("modifier")
         self.messages_modifier = Label(self.popup_modifier)
         self.messages_modifier['text'] = "Choisisez un thème et cliquez sur OK "
-        self.messages_modifier.grid(column = 0, columnspan = 2, row = 0, pady= 10, padx = 15)
+        self.messages_modifier.grid(column = 0, columnspan = 4, row = 0, pady= 10, padx = 15)
 
 
         self.messages_modifier_0 = Button(self.popup_modifier,text="Thème normal", command =lambda :self.Canvas_echiquier.changer_couleur_theme("white","gray"),width = 15)
-        self.messages_modifier_0.grid(column = 0, row = 1, pady= 10)
+        self.messages_modifier_0.grid(column = 0, row = 1, pady= 10,padx=10)
 
-        #todo rajouter autant de bouton avec des thème changer les couleur
         self.messages_modifier_1 = Button(self.popup_modifier,text="Thème noël", command =lambda :self.Canvas_echiquier.changer_couleur_theme("red","green"),width = 15)
-        self.messages_modifier_1.grid(column = 1, row = 1, pady= 10)
+        self.messages_modifier_1.grid(column = 1, row = 1, pady= 10,padx=10)
 
         self.messages_modifier_1 = Button(self.popup_modifier,text="Thème Feu", command =lambda :self.Canvas_echiquier.changer_couleur_theme("red","Darkorange1"),width = 15)
-        self.messages_modifier_1.grid(column = 2, row = 1, pady= 10)
+        self.messages_modifier_1.grid(column = 2, row = 1, pady= 10,padx=10)
 
         self.messages_modifier_1 = Button(self.popup_modifier,text="Thème St-Valentin", command =lambda :self.Canvas_echiquier.changer_couleur_theme("deep pink","red"),width = 15)
-        self.messages_modifier_1.grid(column = 3, row = 1, pady= 10)
+        self.messages_modifier_1.grid(column = 3, row = 1, pady= 10,padx=10)
 
 
         self.bouton_ok = Button(self.popup_modifier, text="Ok", command = self.popup_modifier.destroy,width = 10)
-        self.bouton_ok.grid(column = 0, columnspan = 1, row = 2)
+        self.bouton_ok.grid(column = 0, columnspan = 4, row = 2, pady=15)
 
     #Méthode pour sauvegarder une partie jouée
     def sauvegarder_partie(self, nom_fichier,nouvelle_partie,quitter):
@@ -212,10 +212,6 @@ class menu_global():
         joueur_actif = self.Canvas_echiquier.partie.joueur_actif
 
         liste_mouvement = self.Canvas_echiquier.liste_mouvement_effectuer
-
-        piece_blanc_perdu = self.Canvas_echiquier.piece_blanc_perdu
-
-        piece_noir_perdu = self.Canvas_echiquier.piece_noir_perdu
 
         pickle.dump((joueur_actif,dictionaire,liste_mouvement), open(nom_fichier+".p",'wb'))
 
@@ -295,13 +291,12 @@ class menu_global():
     def menu_fonction(self):
         self.popup_fonction = Toplevel()
         self.popup_fonction.title("Fonctionalité du programe")
-        self.messages_fonction = Label(self.popup_fonction)
-        self.messages_fonction['text'] = "Voici les règle du jeu d'échec pour cette version du programme"
+        self.messages_fonction = Label(self.popup_fonction,font=('Deja Vu', 11),padx= 30)
+        self.messages_fonction['text'] = "\nVoici les les fonction pour cette version du programme.\n"
         self.messages_fonction.grid()
         self.fonction_programe = Label(self.popup_fonction)
 
-        ####################todo remplir ce texte
-        self.texte_fonction_programe = "1) Manger la pièce Roi adverse pour pouvoir gagner la partie." "\n" "2) Vous pouvez annuler le dernier coup joué si besoin.""\n""3) Vous pouvez voir votre dernier coup joué si besoin."
+        self.texte_fonction_programe = "1) Clique droit pour désélectionner la pièce" "\n" "2) Vous pouvez annuler le dernier coup joué si besoin.""\n""3) Vous pouvez voir votre dernier coup joué si besoin."
 
         self.fonction_programe['text'] = self.texte_fonction_programe
         self.fonction_programe.grid()
@@ -313,14 +308,12 @@ class menu_global():
     def menu_regle_du_jeu(self):
         self.popup_regle = Toplevel()
         self.popup_regle.title("Règle du jeu")
-        self.messages_regle = Label(self.popup_regle)
-        self.messages_regle['text'] = "Voici les les fonction pour cette version du programme"
+        self.messages_regle = Label(self.popup_regle,font=('Deja Vu', 11))
+        self.messages_regle['text'] = "\nVoici les règle du jeu d'échec pour cette version du programme.\n"
         self.messages_regle.grid()
-        self.regle_du_jeu = Label(self.popup_regle)
+        self.regle_du_jeu = Label(self.popup_regle, padx= 30)
 
-
-        ############################todo remplir ce texte
-        self.texte_regle_du_jeu = "Le jeu d'échecs se joue à deux joueurs qui font évoluer seize pièces chacun, respectivement blanches et noires, sur un échiquier de 64 cases en alternance blanches et noires." "\n" "Pour parler des adversaires, on dit « les Blancs » et « les Noirs »""\n\n""Pour gagner la partie, il faut vous manger la pièce Roi adverse.""\n\n""Le pion se déplace droit devant lui (vers la 8e rangée pour les Blancs et la 1re rangée pour les Noirs) d'une seule case à chaque coup et sans jamais pouvoir reculer.""\n\n"" Cependant, lors de son tout premier déplacement, chaque pion peut avancer d'une ou de deux cases à la fois, au choix du joueur (au premier coup, on ne peut pas déplacer à la fois deux pions d'une case).""\n\n""Le cavalier est la seule pièce sauteuse (sa case d'arrivée doit être soit inoccupée, soit occupée par une pièce adverse, il n'y a pas d'interception possible comme pour les pièces de ligne).""\n\n"" Son mouvement combiné correspond à deux cases dans une direction comme une Tour puis une case dans une direction perpendiculaire toujours comme une Tour.""\n\n""La tour, le fou et la dame sont des pièces à longue portée, cela signifie qu'elles peuvent se déplacer de plusieurs cases en un seul coup, en ligne droite, tant qu'elles ne sont pas limitées par l'obstacle infranchissable que constitue toute autre pièce, adverse ou non.""\n\n""Pour plus d'information, voici le site web des rêglements du jeu: https://fr.wikipedia.org/wiki/R%C3%A8gles_du_jeu_d%27%C3%A9checs                                                "
+        self.texte_regle_du_jeu = "Le jeu d'échecs se joue à deux joueurs qui font évoluer seize pièces chacun,\nrespectivement blanches et noires, sur un échiquier de 64 cases en alternance blanches et noires." "\n" "Pour parler des adversaires, on dit « les Blancs » et « les Noirs »""\n\n""Pour gagner la partie, il faut vous manger la pièce Roi adverse.""\n\n""Le pion se déplace droit devant lui (vers la 8e rangée pour les Blancs et la 1re rangée pour les Noirs)\n d'une seule case à chaque coup et sans jamais pouvoir reculer.""\n\n"" Cependant, lors de son tout premier déplacement, chaque pion peut avancer d'une ou de deux cases à la fois,\n au choix du joueur (au premier coup, on ne peut pas déplacer à la fois deux pions d'une case).\nLe pion mange en diagonale de une case devant.""\n\n""Le cavalier est la seule pièce sauteuse. Elle peut se déplacer même si le chemin n'est pas libre .""\n"" Il se déplace en forme de L soit de 2 case en ligne doite vers une direction et de une case en perpendiculaire.""\n\n""La tour se déplace en ligne droite, sur une même ligne ou une même colonne.\nLe fou se déplace en diagonale. La dame combine les déplacement de la tour et du fou, elle se déplace donc en ligne droite et en diagonale.\n\nLa tour, le fou et la dame sont des pièces à longue portée,\n cela signifie qu'elles peuvent se déplacer de plusieurs cases en un seul coup, tant qu'elles ne sont pas bloquées par une autre pièce.""\n\n""Pour plus d'information, allez voir les rêglements du jeu sur Wikipedia: \nhttps://fr.wikipedia.org/wiki/R%C3%A8gles_du_jeu_d%27%C3%A9checs                                                "
 
         self.regle_du_jeu['text'] = self.texte_regle_du_jeu
         self.regle_du_jeu.grid()
